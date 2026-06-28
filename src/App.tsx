@@ -510,15 +510,15 @@ export default function App() {
   };
 
   return (
-    <div className="flex h-screen w-screen overflow-hidden bg-[#060913] text-slate-100 font-sans antialiased">
+    <div className="flex h-screen w-screen overflow-hidden bg-[#05070f] text-slate-100 font-sans antialiased">
       {/* Sidebar */}
       <aside className="w-[320px] border-r border-white/5 bg-slate-950/40 flex flex-col h-full z-10 backdrop-blur-xl">
         <div className="p-6 border-b border-white/5 flex items-center gap-3">
-          <div className="w-9 h-9 rounded-lg bg-gradient-to-r from-cyan-400 to-indigo-600 flex items-center justify-center text-white font-extrabold text-xl shadow-lg shadow-cyan-400/20">
+          <div className="w-9 h-9 rounded-lg bg-gradient-to-r from-teal-400 to-emerald-500 flex items-center justify-center text-white font-extrabold text-xl shadow-lg shadow-teal-400/20">
             H
           </div>
           <div>
-            <h1 className="text-base font-bold bg-gradient-to-r from-cyan-400 to-indigo-400 bg-clip-text text-transparent">HealTab LLM</h1>
+            <h1 className="text-base font-bold bg-gradient-to-r from-teal-400 to-emerald-400 bg-clip-text text-transparent">HealTab LLM</h1>
             <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Clinical Intelligence</span>
           </div>
         </div>
@@ -533,7 +533,7 @@ export default function App() {
                 value={apiKey}
                 onChange={handleApiKeyInput}
                 placeholder="Enter Gemini API Key..."
-                className="w-full bg-slate-900 border border-white/10 rounded-md py-2 px-3 text-xs text-white outline-none focus:border-cyan-400 transition-colors"
+                className="w-full bg-slate-900 border border-white/10 rounded-md py-2 px-3 text-xs text-white outline-none focus:border-teal-400 transition-colors"
               />
             </div>
             <div className="flex items-center gap-2 mt-1">
@@ -566,13 +566,13 @@ export default function App() {
             <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Quick Sample Cases</span>
             <button
               onClick={() => handlePreloadSample('retinopathy')}
-              className="w-full text-left bg-slate-900 border border-white/10 hover:border-cyan-400 hover:bg-slate-900/60 rounded-md py-2.5 px-3 text-xs text-slate-300 transition-all flex items-center gap-2 font-medium"
+              className="w-full text-left bg-slate-900 border border-white/10 hover:border-teal-400 hover:bg-slate-900/60 rounded-md py-2.5 px-3 text-xs text-slate-300 transition-all flex items-center gap-2 font-medium"
             >
               👁️ Case Study: Retinopathy
             </button>
             <button
               onClick={() => handlePreloadSample('alzheimer')}
-              className="w-full text-left bg-slate-900 border border-white/10 hover:border-cyan-400 hover:bg-slate-900/60 rounded-md py-2.5 px-3 text-xs text-slate-300 transition-all flex items-center gap-2 font-medium"
+              className="w-full text-left bg-slate-900 border border-white/10 hover:border-teal-400 hover:bg-slate-900/60 rounded-md py-2.5 px-3 text-xs text-slate-300 transition-all flex items-center gap-2 font-medium"
             >
               🧠 Clinical Trial: Alzheimer
             </button>
@@ -586,8 +586,8 @@ export default function App() {
               onDragLeave={handleDragLeave}
               onDrop={handleDrop}
               onClick={() => document.getElementById('file-picker-input')?.click()}
-              className={`border-2 border-dashed border-white/10 rounded-xl p-6 text-center cursor-pointer hover:border-cyan-400/50 hover:bg-white/5 transition-all flex flex-col items-center gap-2 ${
-                isDraggingOver ? 'bg-cyan-500/5 border-cyan-400' : ''
+              className={`border-2 border-dashed border-white/10 rounded-xl p-6 text-center cursor-pointer hover:border-teal-400/50 hover:bg-white/5 transition-all flex flex-col items-center gap-2 ${
+                isDraggingOver ? 'bg-teal-500/5 border-teal-400' : ''
               }`}
             >
               <input
@@ -597,7 +597,7 @@ export default function App() {
                 onChange={handleFileUpload}
                 className="hidden"
               />
-              <span className="text-2xl text-cyan-400 select-none">📤</span>
+              <span className="text-2xl text-teal-400 select-none">📤</span>
               <span className="text-xs font-bold text-slate-300">Upload PDF or TXT</span>
               <span className="text-[10px] text-slate-500">Drag case records here</span>
             </div>
@@ -656,7 +656,7 @@ export default function App() {
                 onClick={() => setActiveTab(tab.id)}
                 className={`px-3.5 py-1.5 rounded-md text-xs font-bold transition-all border ${
                   activeTab === tab.id
-                    ? 'bg-cyan-500/10 text-cyan-300 border-cyan-400/25 shadow-md shadow-cyan-500/5'
+                    ? 'bg-teal-500/10 text-teal-300 border-teal-400/25 shadow-md shadow-teal-500/5'
                     : 'bg-transparent text-slate-400 border-transparent hover:text-white hover:bg-white/5'
                 }`}
               >
@@ -682,7 +682,7 @@ export default function App() {
             )}
             <button
               onClick={printSummaryReport}
-              className="px-3.5 py-1.5 rounded-md text-xs font-bold text-cyan-400 bg-white/5 border border-white/10 hover:bg-white/10 transition-all flex items-center gap-1.5"
+              className="px-3.5 py-1.5 rounded-md text-xs font-bold text-teal-400 bg-white/5 border border-white/10 hover:bg-white/10 transition-all flex items-center gap-1.5"
             >
               📄 Print Report
             </button>
