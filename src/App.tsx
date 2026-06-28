@@ -16,6 +16,7 @@ import ClinicalGraph from './components/ClinicalGraph';
 import SummarySlides from './components/SummarySlides';
 import PodcastBrief from './components/PodcastBrief';
 import AgentChat from './components/AgentChat';
+import SoapNote from './components/SoapNote';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<string>('reader');
@@ -647,7 +648,8 @@ export default function App() {
               { id: 'reader', label: '📖 Case Reader' },
               { id: 'graph', label: '🔬 Clinical Graph' },
               { id: 'deck', label: '📊 Summary Slides' },
-              { id: 'podcast', label: '🎙️ Podcast Study' }
+              { id: 'podcast', label: '🎙️ Podcast Study' },
+              { id: 'soap', label: '📝 SOAP Note' }
             ].map(tab => (
               <button
                 key={tab.id}
@@ -719,6 +721,15 @@ export default function App() {
               dialogue={podcastDialogue}
               onGeneratePodcast={handleGeneratePodcast}
               isLoading={isGeneratingPodcast}
+            />
+          )}
+
+          {activeTab === 'soap' && (
+            <SoapNote
+              document={getActiveDocument()}
+              apiKey={apiKey}
+              model={selectedModel}
+              isConnected={isConnected}
             />
           )}
         </div>
