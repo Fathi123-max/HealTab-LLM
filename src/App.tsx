@@ -669,6 +669,15 @@ export default function App() {
                 ⚡ Analyzing Medical Data...
               </span>
             )}
+            {getActiveDocument() && isConnected && (
+              <button
+                onClick={() => triggerStructuralAnalysis(getActiveDocument()!)}
+                disabled={isAnalyzing}
+                className="px-3 py-1.5 rounded-md text-xs font-bold text-amber-400 bg-white/5 border border-white/10 hover:bg-white/10 transition-all flex items-center gap-1.5 disabled:opacity-40"
+              >
+                🔄 Re-Analyze Case
+              </button>
+            )}
             <button
               onClick={printSummaryReport}
               className="px-3.5 py-1.5 rounded-md text-xs font-bold text-cyan-400 bg-white/5 border border-white/10 hover:bg-white/10 transition-all flex items-center gap-1.5"
