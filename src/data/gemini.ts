@@ -1,7 +1,7 @@
 const BASE_URL = 'https://generativelanguage.googleapis.com/v1beta';
 
 export async function validateApiKey(apiKey: string): Promise<boolean> {
-  const url = `${BASE_URL}/models/gemini-3.5-flash:generateContent?key=${apiKey}`;
+  const url = `${BASE_URL}/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
   try {
     const response = await fetch(url, {
       method: 'POST',
