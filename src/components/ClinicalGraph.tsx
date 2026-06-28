@@ -10,6 +10,7 @@ interface ClinicalGraphProps {
   onSelectNode: (node: GraphNode | null) => void;
   isContextLocked: boolean;
   onToggleContextLock: (locked: boolean) => void;
+  onQueryNode?: (term: string) => void;
 }
 
 export default function ClinicalGraph({
@@ -17,7 +18,8 @@ export default function ClinicalGraph({
   selectedNodeId,
   onSelectNode,
   isContextLocked,
-  onToggleContextLock
+  onToggleContextLock,
+  onQueryNode
 }: ClinicalGraphProps) {
   const [nodes, setNodes] = useState<GraphNode[]>([]);
   const [links, setLinks] = useState<GraphLink[]>([]);
@@ -376,6 +378,12 @@ export default function ClinicalGraph({
                   <p className="mb-2"><strong>Category:</strong> {activeNode.type.toUpperCase()}</p>
                   <p><strong>Context Details:</strong> {activeNode.details}</p>
                 </div>
+                <button
+                  onClick={() => onQueryNode?.(activeNode.label)}
+                  className="mt-4 w-full py-2 bg-slate-900 border border-white/10 hover:border-cyan-400/35 hover:bg-slate-900/60 rounded text-[11px] font-bold text-white transition-all active:scale-95"
+                >
+                  💬 Ask AI about this node
+                </button>
               </div>
             ) : (
               <p className="text-slate-500 text-xs italic">Select a node on the graph canvas to inspect clinical coding details.</p>

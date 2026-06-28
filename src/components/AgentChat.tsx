@@ -58,6 +58,36 @@ export default function AgentChat({
     }
   }, []);
 
+  const formatMessageText = (text: string) => {
+    if (text.startsWith("Disclaimer:")) {
+      const index = text.indexOf('\n');
+      if (index !== -1) {
+        const disclaimer = text.substring(0, index);
+        const rest = text.substring(index + 1);
+        return (
+          <div className="flex flex-col gap-2.5">
+            <div className="bg-amber-500/10 border-l-2 border-amber-500/80 p-2.5 rounded text-[10px] text-amber-300 font-semibold leading-normal select-none">
+              ⚠️ {disclaimer}
+            </div>
+            <div className="whitespace-pre-wrap">{rest}</div>
+          </div>
+        );
+      }
+    }
+
+    const parts = text.split(/(\*\*.*?\*\*)/g);
+    return (
+      <div className="whitespace-pre-wrap">
+        {parts.map((part, idx) => {
+          if (part.startsWith('**') && part.endsWith('**')) {
+            return <strong key={idx} className="text-cyan-400 font-bold">{part.slice(2, -2)}</strong>;
+          }
+          return part;
+        })}
+      </div>
+    );
+  };
+
   const handleSend = () => {
     if (!inputText.trim()) return;
     onSendMessage(inputText.trim());
@@ -118,7 +148,7 @@ export default function AgentChat({
                   : 'bg-slate-900 border border-white/5 text-slate-200 rounded-bl-none'
               }`}
             >
-              {msg.text}
+              {formatMessageText(msg.text)}
 
               {/* Render Citations */}
               {msg.citations && msg.citations.length > 0 && (

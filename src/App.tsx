@@ -703,6 +703,7 @@ export default function App() {
               onSelectNode={(node) => setSelectedNodeId(node ? node.id : null)}
               isContextLocked={isContextLocked}
               onToggleContextLock={setIsContextLocked}
+              onQueryNode={handleAskAboutTerm}
             />
           )}
 
