@@ -26,7 +26,7 @@ export default function App() {
   const [apiKey, setApiKey] = useState<string>('');
   const [isConnected, setIsConnected] = useState<boolean>(false);
   const [isCheckingKey, setIsCheckingKey] = useState<boolean>(false);
-  const [selectedModel, setSelectedModel] = useState<string>('gemini-1.5-flash');
+  const [selectedModel, setSelectedModel] = useState<string>('gemini-2.5-flash');
 
   // Analysis States
   const [graphData, setGraphData] = useState<{ nodes: GraphNode[]; links: GraphLink[] } | null>(null);
@@ -553,9 +553,10 @@ export default function App() {
               onChange={(e) => setSelectedModel(e.target.value)}
               className="w-full bg-slate-900 border border-white/10 rounded-md py-2 px-3 text-xs text-white outline-none cursor-pointer"
             >
-              <option value="gemini-1.5-flash">Gemini 1.5 Flash (Recommended)</option>
-              <option value="gemini-1.5-pro">Gemini 1.5 Pro (Advanced)</option>
-              <option value="gemini-2.0-flash-exp">Gemini 2.0 Flash</option>
+              <option value="gemini-2.5-flash">Gemini 2.5 Flash (Recommended)</option>
+              <option value="gemini-2.5-pro">Gemini 2.5 Pro (Clinical Diagnostics)</option>
+              <option value="gemini-2.0-flash">Gemini 2.0 Flash (Stable Speed)</option>
+              <option value="gemini-1.5-pro">Gemini 1.5 Pro (Legacy Advanced)</option>
             </select>
           </div>
 
