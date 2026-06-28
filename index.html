@@ -102,6 +102,7 @@
           <button class="tab-btn active" data-tab="reader">📖 Case Reader</button>
           <button class="tab-btn" data-tab="graph">🔬 Clinical Graph</button>
           <button class="tab-btn" data-tab="deck">📊 Summary Slides</button>
+          <button class="tab-btn" data-tab="podcast">🎙️ Podcast Study</button>
         </div>
         <div class="header-actions">
           <button id="theme-toggle" class="theme-toggle-btn" title="Toggle Light/Dark Mode">☀️</button>
@@ -133,6 +134,13 @@
             </div>
             <aside class="graph-sidebar" id="graph-details-panel">
               <h3 class="sidebar-section-title">Clinical Associations</h3>
+              <div style="margin-bottom: 12px; display: flex; gap: 6px;">
+                <input type="text" id="graph-search-input" placeholder="Search entity node..." style="width: 100%; padding: 8px 12px; background: var(--bg-tertiary); border: 1px solid var(--glass-border); border-radius: var(--radius-md); color: var(--text-primary); font-size: 12px; outline: none; transition: border-color 0.2s;">
+              </div>
+              <div style="margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                <input type="checkbox" id="graph-lock-context" style="cursor: pointer; width: 14px; height: 14px;">
+                <label for="graph-lock-context" style="font-size: 11.5px; color: var(--text-secondary); cursor: pointer; user-select: none;">Lock Chat Context to Node</label>
+              </div>
               <div class="graph-details-card">
                 <h4 class="graph-details-title" id="graph-detail-title">Select an entity node</h4>
                 <p class="graph-details-body" id="graph-detail-body">
@@ -147,11 +155,31 @@
         <!-- Tab 3: Summary Slides Deck -->
         <div class="workspace-panel" id="tab-deck">
           <div class="deck-container">
-            <div class="deck-workspace" id="deck-workspace">
-              <div class="slide-container" id="slide-container">
-                <!-- Slides render here -->
+            <div style="display: flex; gap: 20px; width: 100%; max-width: 1000px; flex: 1; align-items: stretch; min-height: 0;">
+              <div class="deck-workspace" id="deck-workspace" style="flex: 1.3; min-width: 0;">
+                <div class="slide-container" id="slide-container">
+                  <!-- Slides render here -->
+                </div>
               </div>
+              <aside class="graph-sidebar" style="flex: 0.7; padding: 18px; display: flex; flex-direction: column; gap: 14px; min-width: 0; overflow-y: auto;">
+                <h3 class="sidebar-section-title" style="margin-bottom: 2px;">Slide Customizer</h3>
+                <div>
+                  <label style="font-size: 11px; color: var(--text-muted); display: block; margin-bottom: 6px; font-weight:600; text-transform:uppercase; letter-spacing:0.5px;">Presentation Theme</label>
+                  <select id="slide-theme-select" style="width: 100%; background: var(--bg-tertiary); border: 1px solid var(--glass-border); color: var(--text-primary); padding: 10px; border-radius: var(--radius-md); outline: none; font-size: 12.5px; cursor: pointer; transition: border-color 0.2s;">
+                    <option value="theme-midnight">Midnight Dark (Default)</option>
+                    <option value="theme-emerald">Emerald Medical</option>
+                    <option value="theme-crimson">Deep Crimson</option>
+                    <option value="theme-cyber">Cyber Clinic</option>
+                  </select>
+                </div>
+                <div style="flex: 1; display: flex; flex-direction: column; gap: 6px; margin-top: 4px;">
+                  <label style="font-size: 11px; color: var(--text-muted); display: block; font-weight:600; text-transform:uppercase; letter-spacing:0.5px;">Edit Slide Points</label>
+                  <textarea id="slide-editor-textarea" style="flex: 1; width: 100%; background: var(--bg-tertiary); border: 1px solid var(--glass-border); color: var(--text-primary); padding: 12px; border-radius: var(--radius-md); font-size: 12.5px; line-height: 1.5; outline: none; resize: none; font-family: var(--font-sans); min-height: 120px;" placeholder="Edit bullet points (one per line)..."></textarea>
+                </div>
+                <button class="graph-action-btn" id="btn-save-slide" style="padding: 10px; font-size: 12px; background:var(--grad-cyan-blue); border:none; border-radius:var(--radius-md); color:#fff; font-weight:600; cursor:pointer;">Update Slide</button>
+              </aside>
             </div>
+            
             <div class="deck-controls">
               <button id="deck-prev" class="deck-nav-btn" disabled>&larr; Back</button>
               <span id="deck-indicator" class="deck-progress-indicator">Slide 0 of 0</span>
@@ -164,6 +192,56 @@
                 <button id="deck-export" class="deck-action-btn" title="Export Presentation Deck to HTML">
                   📥 Export Slide Deck
                 </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab 4: Interactive 2-Host Audio Podcast -->
+        <div class="workspace-panel" id="tab-podcast">
+          <div style="display: flex; flex-direction: column; height: 100%; padding: 24px; align-items: center; justify-content: center; overflow: hidden; gap: 24px;">
+            <div style="text-align: center; max-width: 600px;">
+              <h2 style="font-size: 24px; font-weight: 700; margin-bottom: 8px; background: var(--grad-cyan-blue); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Clinical Podcast Studio</h2>
+              <p style="font-size: 13.5px; color: var(--text-secondary); line-height: 1.5;">Listen to a simulated, interactive clinical brief between senior director <strong>Dr. Sarah</strong> and lead neurologist <strong>Dr. James</strong> reviewing your clinical files.</p>
+            </div>
+            
+            <!-- Player Card -->
+            <div style="width: 100%; max-width: 500px; background: var(--bg-secondary); border: 1px solid var(--glass-border); border-radius: var(--radius-lg); padding: 30px; display: flex; flex-direction: column; gap: 24px; align-items: center; box-shadow: var(--shadow-premium); backdrop-filter: blur(12px);">
+              <!-- EQ Waveform Visualizer -->
+              <div id="podcast-equalizer" style="display: flex; gap: 6px; align-items: flex-end; height: 50px; opacity: 0.5; transition: opacity 0.3s;">
+                <div class="eq-bar" style="width: 4px; height: 10px; background: var(--accent-cyan); border-radius: 2px;"></div>
+                <div class="eq-bar" style="width: 4px; height: 25px; background: var(--accent-teal); border-radius: 2px;"></div>
+                <div class="eq-bar" style="width: 4px; height: 45px; background: var(--accent-green); border-radius: 2px;"></div>
+                <div class="eq-bar" style="width: 4px; height: 15px; background: var(--accent-purple); border-radius: 2px;"></div>
+                <div class="eq-bar" style="width: 4px; height: 30px; background: var(--accent-pink); border-radius: 2px;"></div>
+                <div class="eq-bar" style="width: 4px; height: 12px; background: var(--accent-cyan); border-radius: 2px;"></div>
+                <div class="eq-bar" style="width: 4px; height: 38px; background: var(--accent-teal); border-radius: 2px;"></div>
+              </div>
+              
+              <!-- Host Avatars -->
+              <div style="display: flex; gap: 40px; justify-content: center; width: 100%;">
+                <div id="host-sarah" style="text-align: center; display: flex; flex-direction: column; align-items: center; opacity: 0.4; transition: all 0.3s; transform: scale(0.95);">
+                  <div style="width: 60px; height: 60px; background: var(--grad-cyan-blue); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 26px; color: #fff; font-weight: 700; box-shadow: 0 4px 15px rgba(0, 242, 254, 0.2);">👩‍⚕️</div>
+                  <span style="font-size: 13px; font-weight: 600; color: var(--text-primary); margin-top: 8px;">Dr. Sarah</span>
+                  <span style="font-size: 11px; color: var(--text-muted);">Senior Host</span>
+                </div>
+                <div id="host-james" style="text-align: center; display: flex; flex-direction: column; align-items: center; opacity: 0.4; transition: all 0.3s; transform: scale(0.95);">
+                  <div style="width: 60px; height: 60px; background: var(--grad-purple-pink); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 26px; color: #fff; font-weight: 700; box-shadow: 0 4px 15px rgba(139, 92, 246, 0.2);">👨‍⚕️</div>
+                  <span style="font-size: 13px; font-weight: 600; color: var(--text-primary); margin-top: 8px;">Dr. James</span>
+                  <span style="font-size: 11px; color: var(--text-muted);">Co-Host</span>
+                </div>
+              </div>
+
+              <!-- Dialog Transcript Subtitles -->
+              <div id="podcast-transcript-box" style="width: 100%; background: var(--bg-tertiary); border: 1px solid var(--glass-border); border-radius: var(--radius-md); padding: 18px; font-size: 14px; line-height: 1.5; color: var(--text-primary); min-height: 80px; text-align: center; display: flex; align-items: center; justify-content: center; font-style: italic; border-left: 3px solid var(--accent-cyan);">
+                Click Play Podcast to start listening to the clinical discussion.
+              </div>
+
+              <!-- Player Controls -->
+              <div style="display: flex; gap: 14px;">
+                <button id="btn-play-podcast" class="deck-nav-btn" style="background: var(--grad-cyan-blue); color:#fff; border:none; box-shadow: 0 4px 12px rgba(0, 242, 254, 0.3); font-weight:600; padding: 10px 20px;">▶ Play Brief</button>
+                <button id="btn-pause-podcast" class="deck-nav-btn" disabled style="padding: 10px 20px;">⏸ Pause</button>
+                <button id="btn-reset-podcast" class="deck-nav-btn" style="padding: 10px 20px;">🔄 Reset</button>
               </div>
             </div>
           </div>
@@ -203,6 +281,7 @@
       <div class="chat-input-area">
         <div class="chat-input-wrapper">
           <input type="text" id="chat-input" class="chat-input" placeholder="Ask about clinical studies or patient files...">
+          <button id="chat-mic-btn" style="position: absolute; right: 12px; background: transparent; border: none; font-size: 15px; color: var(--text-muted); cursor: pointer; display: flex; align-items: center; justify-content: center; width: 24px; height: 24px;" title="Dictate Query (Voice Input)">🎙️</button>
         </div>
         <button id="chat-submit" class="chat-submit-btn">✈️</button>
       </div>

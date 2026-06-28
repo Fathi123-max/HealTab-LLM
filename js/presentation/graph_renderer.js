@@ -300,6 +300,36 @@ class GraphRenderer {
     `;
     this.selectedNodeId = node.id;
     this.selectedNodeLabel = node.label;
+    this.selectedNodeType = node.type;
+    this.selectedNodeDetails = node.details;
+  }
+
+  // Filter nodes interactively on search input
+  filterNodes(searchText) {
+    if (!this.nodeElements) return;
+    const searchLower = searchText.trim().toLowerCase();
+    
+    this.nodeElements.forEach(ne => {
+      const match = !searchLower || 
+        ne.node.label.toLowerCase().includes(searchLower) || 
+        ne.node.details.toLowerCase().includes(searchLower) ||
+        ne.node.type.toLowerCase().includes(searchLower);
+      
+      ne.g.style.opacity = match ? '1' : '0.15';
+    });
+
+    if (this.linkElements) {
+      this.linkElements.forEach(le => {
+        const sourceNode = this.nodes.find(n => n.id === le.source);
+        const targetNode = this.nodes.find(n => n.id === le.target);
+        const match = !searchLower || 
+          (sourceNode && (sourceNode.label.toLowerCase().includes(searchLower) || sourceNode.details.toLowerCase().includes(searchLower))) ||
+          (targetNode && (targetNode.label.toLowerCase().includes(searchLower) || targetNode.details.toLowerCase().includes(searchLower)));
+        
+        le.line.style.opacity = match ? '1' : '0.1';
+        le.text.style.opacity = match ? '1' : '0.1';
+      });
+    }
   }
 }
 

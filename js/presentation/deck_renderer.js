@@ -89,9 +89,32 @@ class DeckRenderer {
       this.indicator.textContent = `Slide ${this.currentSlideIndex + 1} of ${this.slides.length}`;
     }
 
+    // Populate Slide Editor Text Area
+    const editor = document.getElementById('slide-editor-textarea');
+    if (editor && this.slides[this.currentSlideIndex]) {
+      editor.value = this.slides[this.currentSlideIndex].bulletPoints.join('\n');
+    }
+
     // Toggle button disabled state
     if (this.prevBtn) this.prevBtn.disabled = this.currentSlideIndex === 0;
     if (this.nextBtn) this.nextBtn.disabled = this.currentSlideIndex === this.slides.length - 1;
+  }
+
+  // Update active slide bullet points
+  updateCurrentSlide(bulletsArray) {
+    if (this.slides.length > 0 && this.slides[this.currentSlideIndex]) {
+      this.slides[this.currentSlideIndex].bulletPoints = bulletsArray;
+      this.updateUI();
+    }
+  }
+
+  // Set visual theme
+  setTheme(themeClass) {
+    const ws = document.getElementById('deck-workspace');
+    if (ws) {
+      // Clear other themes
+      ws.className = 'deck-workspace ' + themeClass;
+    }
   }
 
   // Highlight medical terminology in bullet points
