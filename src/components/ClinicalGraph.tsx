@@ -190,15 +190,27 @@ export default function ClinicalGraph({
     dragNodeRef.current = null;
   };
 
+  const getNodeEmoji = (type: string) => {
+    switch (type.toLowerCase()) {
+      case 'patient': return '👤';
+      case 'symptom': return '🌡️';
+      case 'diagnosis': return '📋';
+      case 'treatment': return '⚡';
+      case 'drug': return '💊';
+      case 'test': return '🧪';
+      default: return '🔍';
+    }
+  };
+
   const getNodeColor = (type: string) => {
     switch (type.toLowerCase()) {
-      case 'patient': return '#00f2fe';
-      case 'symptom': return '#fbbf24';
-      case 'diagnosis': return '#a78bfa';
-      case 'treatment': return '#38bdf8';
-      case 'drug': return '#10b981';
-      case 'test': return '#f472b6';
-      default: return '#f43f5e';
+      case 'patient': return '#2dd4bf'; // Clinical Teal
+      case 'symptom': return '#fbbf24'; // Warning Amber
+      case 'diagnosis': return '#c084fc'; // Purple
+      case 'treatment': return '#38bdf8'; // Sky Blue
+      case 'drug': return '#34d399'; // Emerald
+      case 'test': return '#60a5fa'; // Blue
+      default: return '#f87171'; // Red
     }
   };
 
@@ -315,11 +327,19 @@ export default function ClinicalGraph({
                   <circle
                     r={node.type === 'patient' ? 14 : 10}
                     fill={color}
-                    stroke={isSelected ? '#00f2fe' : 'rgba(255,255,255,0.2)'}
+                    stroke={isSelected ? '#2dd4bf' : 'rgba(255,255,255,0.2)'}
                     strokeWidth={isSelected ? '4px' : '2px'}
-                    className="transition-all duration-200 group-hover:scale-110"
-                    style={{ filter: isSelected ? 'drop-shadow(0 0 10px #00f2fe)' : 'none' }}
+                    className="opacity-75 transition-all duration-200 group-hover:scale-110"
+                    style={{ filter: isSelected ? 'drop-shadow(0 0 10px #2dd4bf)' : 'none' }}
                   />
+                  <text
+                    textAnchor="middle"
+                    dy=".3em"
+                    fontSize={node.type === 'patient' ? '12' : '9'}
+                    className="pointer-events-none select-none"
+                  >
+                    {getNodeEmoji(node.type)}
+                  </text>
                   <text
                     y={node.type === 'patient' ? 26 : 22}
                     textAnchor="middle"
@@ -347,6 +367,19 @@ export default function ClinicalGraph({
             placeholder="Filter entities (e.g., 'drug')..."
             className="bg-slate-900 border-white/10 text-xs text-white"
           />
+        </div>
+
+        {/* Clinical Color-Blind Category Legend */}
+        <div className="flex flex-col gap-2 border-t border-white/5 pt-4">
+          <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Clinical Legend</span>
+          <div className="flex flex-wrap gap-2 text-[10px]">
+            <span className="px-2 py-1 rounded bg-[#2dd4bf]/10 text-[#2dd4bf] font-bold border border-[#2dd4bf]/25 flex items-center gap-1">👤 Patient</span>
+            <span className="px-2 py-1 rounded bg-[#fbbf24]/10 text-[#fbbf24] font-bold border border-[#fbbf24]/25 flex items-center gap-1">🌡️ Symptom</span>
+            <span className="px-2 py-1 rounded bg-[#c084fc]/10 text-[#c084fc] font-bold border border-[#c084fc]/25 flex items-center gap-1">📋 Diagnosis</span>
+            <span className="px-2 py-1 rounded bg-[#38bdf8]/10 text-[#38bdf8] font-bold border border-[#38bdf8]/25 flex items-center gap-1">⚡ Treatment</span>
+            <span className="px-2 py-1 rounded bg-[#34d399]/10 text-[#34d399] font-bold border border-[#34d399]/25 flex items-center gap-1">💊 Drug</span>
+            <span className="px-2 py-1 rounded bg-[#60a5fa]/10 text-[#60a5fa] font-bold border border-[#60a5fa]/25 flex items-center gap-1">🧪 Test</span>
+          </div>
         </div>
 
         <div className="flex items-center gap-3 border-t border-white/5 pt-4">
