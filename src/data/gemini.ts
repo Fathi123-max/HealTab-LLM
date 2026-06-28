@@ -1,21 +1,12 @@
 const BASE_URL = 'https://generativelanguage.googleapis.com/v1beta';
 
 export async function validateApiKey(apiKey: string): Promise<boolean> {
-  const url = `${BASE_URL}/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+  const url = `${BASE_URL}/models?key=${apiKey}`;
   try {
     const response = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        contents: [{ parts: [{ text: 'Hello, this is a validation test. Respond only with "OK".' }] }]
-      })
+      method: 'GET'
     });
-    
-    if (!response.ok) return false;
-    const data = await response.json();
-    return !!(data.candidates && data.candidates[0]?.content?.parts[0]?.text);
+    return response.ok;
   } catch (e) {
     console.error('Gemini API Validation Error:', e);
     return false;
