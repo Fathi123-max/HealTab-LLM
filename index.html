@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="HealTab LLM - An Agentic Medical & Clinical Document Assistant. Upload patient profiles, trial summaries, and clinical trials to extract interactive knowledge graphs, presentation decks, and chat with grounded citations.">
+  <meta name="author" content="HealTab Intelligence Group">
+  <title>HealTab LLM - Agentic Medical & Clinical Document Assistant</title>
+  
+  <!-- Main Stylesheet -->
+  <link rel="stylesheet" href="css/styles.css">
+  
+  <!-- PDF.js Library (Client-Side PDF Parsing) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+</head>
+<body>
+
+  <div class="app-container">
+    
+    <!-- LEFT SIDEBAR: API Settings & Document Management -->
+    <aside class="sidebar">
+      <div class="brand-section">
+        <div class="brand-logo">H</div>
+        <div class="brand-info">
+          <h1>HealTab LLM</h1>
+          <span>Clinical Document Intelligence</span>
+        </div>
+      </div>
+      
+      <div class="sidebar-scrollable">
+        
+        <!-- API Setup Section -->
+        <div class="sidebar-section">
+          <h2 class="sidebar-section-title">API Authentication</h2>
+          <div class="api-group">
+            <div class="api-input-wrapper">
+              <input type="password" id="api-key" class="api-input" placeholder="Enter Gemini API Key...">
+              <span id="toggle-api-visibility" class="api-toggle-visibility">👁️</span>
+            </div>
+            <div class="api-status">
+              <span id="status-indicator" class="status-indicator"></span>
+              <span id="status-text">Disconnected</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Model Setup Section -->
+        <div class="sidebar-section">
+          <h2 class="sidebar-section-title">LLM Brain Model</h2>
+          <div class="model-group">
+            <select id="model-select">
+              <option value="gemini-2.5-flash">Gemini 2.5 Flash (Recommended)</option>
+              <option value="gemini-2.5-pro">Gemini 2.5 Pro (Clinical Logic)</option>
+              <option value="gemini-1.5-flash">Gemini 1.5 Flash (Performance)</option>
+              <option value="gemini-1.5-pro">Gemini 1.5 Pro</option>
+            </select>
+          </div>
+        </div>
+        
+        <!-- Preloaded Case Studies Section -->
+        <div class="sidebar-section">
+          <h2 class="sidebar-section-title">Clinical Samples (Quick Test)</h2>
+          <div class="samples-container">
+            <button class="sample-btn" onclick="window.uiController.loadSample('Case: Diabetic Retinopathy', 'samples/case_study_diabetic_retinopathy.txt')">
+              👁️ Case Study: Retinopathy
+            </button>
+            <button class="sample-btn" onclick="window.uiController.loadSample('Trial: Solanezumab Alzheimer', 'samples/clinical_trial_summary.txt')">
+              👁️ Clinical Trial: Alzheimer
+            </button>
+          </div>
+        </div>
+
+        <!-- Upload Document Box -->
+        <div class="sidebar-section">
+          <h2 class="sidebar-section-title">Clinical Knowledge Base</h2>
+          <div class="upload-zone" id="upload-zone">
+            <div class="upload-icon">📤</div>
+            <div class="upload-text">Upload Patient Files</div>
+            <div class="upload-subtext">Drag & drop PDFs or TXT files</div>
+            <input type="file" id="file-input" style="display: none;" accept=".pdf,.txt" multiple>
+          </div>
+        </div>
+
+        <!-- Active Documents List -->
+        <div class="sidebar-section" style="flex: 1; display: flex; flex-direction: column;">
+          <h2 class="sidebar-section-title">Uploaded Records</h2>
+          <div class="file-list" id="sidebar-file-list">
+            <!-- Dynamically populated files -->
+            <p style="font-size: 12px; color: var(--text-muted); text-align: center; margin-top: 10px;">
+              No documents active.
+            </p>
+          </div>
+        </div>
+        
+      </div>
+    </aside>
+
+    <!-- CENTER WORKSPACE PANEL: Interactive Tabs -->
+    <main class="workspace-container">
+      <div class="workspace-header">
+        <div class="tab-group">
+          <button class="tab-btn active" data-tab="reader">📖 Case Reader</button>
+          <button class="tab-btn" data-tab="graph">🔬 Clinical Graph</button>
+          <button class="tab-btn" data-tab="deck">📊 Summary Slides</button>
+        </div>
+        <div class="header-actions">
+          <button id="theme-toggle" class="theme-toggle-btn" title="Toggle Light/Dark Mode">☀️</button>
+        </div>
+      </div>
+
+      <!-- Display Area -->
+      <div class="workspace-panels">
+        
+        <!-- Tab 1: Interactive Document Reader -->
+        <div class="workspace-panel active" id="tab-reader">
+          <div class="document-viewer">
+            <div class="viewer-placeholder" id="viewer-placeholder">
+              <span class="viewer-placeholder-icon">📋</span>
+              <p>No document loaded in workspace. Select a preloaded sample or upload your own files to read.</p>
+            </div>
+            <div class="viewer-content-card" id="viewer-content-card" style="display: none;">
+              <h2 class="document-title" id="doc-title"></h2>
+              <div class="document-body" id="doc-body"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab 2: Clinical Knowledge Graph -->
+        <div class="workspace-panel" id="tab-graph">
+          <div class="graph-container">
+            <div class="graph-canvas-wrapper">
+              <svg id="graph-svg" class="graph-canvas"></svg>
+            </div>
+            <aside class="graph-sidebar" id="graph-details-panel">
+              <h3 class="sidebar-section-title">Clinical Associations</h3>
+              <div class="graph-details-card">
+                <h4 class="graph-details-title" id="graph-detail-title">Select an entity node</h4>
+                <p class="graph-details-body" id="graph-detail-body">
+                  Click on nodes in the graph view to reveal detailed patient metrics, symptom analyses, and treatment plans.
+                </p>
+              </div>
+              <button class="graph-action-btn" id="btn-generate-graph">Ask AI About Entity</button>
+            </aside>
+          </div>
+        </div>
+
+        <!-- Tab 3: Summary Slides Deck -->
+        <div class="workspace-panel" id="tab-deck">
+          <div class="deck-container">
+            <div class="deck-workspace" id="deck-workspace">
+              <div class="slide-container" id="slide-container">
+                <!-- Slides render here -->
+              </div>
+            </div>
+            <div class="deck-controls">
+              <button id="deck-prev" class="deck-nav-btn" disabled>&larr; Back</button>
+              <span id="deck-indicator" class="deck-progress-indicator">Slide 0 of 0</span>
+              <button id="deck-next" class="deck-nav-btn" disabled>Next &rarr;</button>
+              
+              <div class="deck-actions">
+                <button id="deck-fullscreen" class="deck-action-btn" title="Presenter Fullscreen Mode">
+                  📺 Fullscreen
+                </button>
+                <button id="deck-export" class="deck-action-btn" title="Export Presentation Deck to HTML">
+                  📥 Export Slide Deck
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </main>
+
+    <!-- RIGHT PANEL: Agentic Grounded Chatbot -->
+    <section class="chat-panel">
+      <div class="chat-header">
+        <div class="chat-header-title">
+          <i>🔬</i>
+          <div>
+            <h2>HealTab AI Agent</h2>
+            <span class="chat-header-subtitle">Grounded Medical Companion</span>
+          </div>
+        </div>
+        <select id="chat-doc-select" class="model-group" style="width: auto; padding: 4px 8px; font-size: 11px;">
+          <option value="all">All Documents</option>
+        </select>
+      </div>
+
+      <!-- Messages Thread -->
+      <div class="chat-messages" id="chat-messages">
+        <!-- Messages populate here -->
+      </div>
+
+      <!-- Quick suggest chips -->
+      <div class="chat-chips">
+        <button class="chat-chip" data-prompt="Summarize the primary patient diagnostic markers and demographics.">📝 Case Summary</button>
+        <button class="chat-chip" data-prompt="What are the critical interventions scheduled and therapeutic drug dosage instructions?">💊 Drug Dosage</button>
+        <button class="chat-chip" data-prompt="Are there any clinical warning signals, contraindications, or risk parameters highlighted?">⚠️ Clinical Warnings</button>
+      </div>
+
+      <!-- Chat input field bar -->
+      <div class="chat-input-area">
+        <div class="chat-input-wrapper">
+          <input type="text" id="chat-input" class="chat-input" placeholder="Ask about clinical studies or patient files...">
+        </div>
+        <button id="chat-submit" class="chat-submit-btn">✈️</button>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- Javascript Modules Loading -->
+  <script src="js/data/gemini_api.js"></script>
+  <script src="js/data/document_storage.js"></script>
+  <script src="js/domain/clinical_summarizer.js"></script>
+  <script src="js/domain/agentic_chat.js"></script>
+  <script src="js/presentation/graph_renderer.js"></script>
+  <script src="js/presentation/deck_renderer.js"></script>
+  <script src="js/presentation/ui.js"></script>
+</body>
+</html>

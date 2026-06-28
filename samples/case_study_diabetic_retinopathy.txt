@@ -1,0 +1,36 @@
+Case ID: CLIN-2026-X892
+Patient Age: 58
+Gender: Female
+Primary Diagnosis: Proliferative Diabetic Retinopathy (PDR) with secondary Macular Edema (DME)
+
+Clinical History:
+The patient is a 58-year-old female with a 15-year history of Type 2 Diabetes Mellitus. She presented with a progressive decline in bilateral visual acuity over the past 6 months, more pronounced in the left eye. Her blood glucose levels have been poorly controlled, with a recent HbA1c of 8.7%. Comorbidities include essential hypertension managed with Lisinopril 10mg daily and hyperlipidemia managed with Atorvastatin 20mg daily.
+
+Diagnostic Findings:
+1. Visual Acuity:
+   - Right Eye (OD): 20/40
+   - Left Eye (OS): 20/80
+2. Intraocular Pressure (IOP):
+   - OD: 16 mmHg
+   - OS: 17 mmHg
+3. Dilated Fundus Examination:
+   - OD: Multiple microaneurysms, intraretinal hemorrhages in all four quadrants, and moderate cotton wool spots.
+   - OS: Neovascularization at the disc (NVD) and neovascularization elsewhere (NVE), fibrous proliferation, and a localized vitreous hemorrhage.
+4. Optical Coherence Tomography (OCT):
+   - Central subfield thickness (CST) was 380 micrometers in the right eye and 450 micrometers in the left eye, indicating significant macular edema (DME), worse on the left side.
+
+Proposed Treatment Plan:
+1. Anti-VEGF Therapy:
+   - Initiate intravitreal injections of Aflibercept (Eylea) 2.0 mg in both eyes.
+   - Injection Schedule: Load with 3 monthly injections, followed by treat-and-extend protocol.
+2. Panretinal Photocoagulation (PRP):
+   - Schedule PRP for the left eye (OS) to address high-risk proliferative features (NVD, NVE) and prevent further vitreous hemorrhage.
+3. Systemic Optimization:
+   - Refer to Endocrinology for intensive glycemic control targeting HbA1c < 7.0%.
+   - Advise strict blood pressure control (target < 130/80 mmHg) and lipid management.
+
+Prognosis & Reference:
+With aggressive local ocular therapy and systemic control, the prognosis for vision retention is moderate. However, untreated proliferative diabetic retinopathy carries a high risk of permanent, severe vision loss due to tractional retinal detachment or neovascular glaucoma.
+References:
+[1] American Academy of Ophthalmology Retina/Vitreous Panel. Preferred Practice Pattern: Diabetic Retinopathy. AAO, 2025.
+[2] Early Treatment Diabetic Retinopathy Study Research Group. Photocoagulation for diabetic retinopathy. ETDRS Report Number 9. Ophthalmology, 1991.

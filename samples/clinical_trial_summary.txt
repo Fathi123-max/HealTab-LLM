@@ -1,0 +1,34 @@
+Trial ID: NCT-2026-MED90
+Sponsor: Global Neuro-Therapeutics Inc.
+Phase: Phase III Clinical Trial
+Drug Compound: Solanezumab-Beta (GNT-889)
+Indication: Early-stage Alzheimer's Disease (Mild Cognitive Impairment)
+
+Study Objectives:
+To evaluate the efficacy and safety of GNT-889 (a humanized monoclonal antibody targeting amyloid-beta plaques) in delaying cognitive decline in patients with early-stage Alzheimer's disease compared to a placebo.
+
+Methodology:
+- Patient Enrollment: 1,200 participants aged 60-80 years.
+- Randomization: Double-blind, randomized, placebo-controlled trial.
+- Treatment Arms:
+  - Arm A (Experimental): Intravenous infusion of GNT-889 (10 mg/kg) every 4 weeks for 72 weeks.
+  - Arm B (Control): Matching placebo infusion every 4 weeks for 72 weeks.
+- Primary Endpoints: Change from baseline in the Alzheimer's Disease Assessment Scale-Cognitive Subscale (ADAS-Cog 13) at week 72.
+- Secondary Endpoints: Changes in Clinical Dementia Rating-Sum of Boxes (CDR-SB), amyloid PET scan imaging of plaque density, and cerebrospinal fluid (CSF) tau levels.
+
+Results & Key Findings:
+1. Cognitive Efficacy:
+   - Patients in Arm A (GNT-889) demonstrated a statistically significant 32% slower rate of decline on the ADAS-Cog 13 scale at week 72 compared to the placebo group (p < 0.001).
+   - Clinical Dementia Rating-Sum of Boxes (CDR-SB) showed a 27% reduction in progression rate for the GNT-889 cohort.
+2. Biomarker Analysis:
+   - Amyloid PET imaging revealed a substantial 45% reduction in brain amyloid plaque burden in Arm A compared to baseline, whereas Arm B showed a 5% increase.
+   - CSF phosphorylated tau (p-tau181) levels decreased significantly in Arm A, suggesting downstream neuroprotective benefits.
+3. Safety Profile:
+   - Amyloid-Related Imaging Abnormalities (ARIA): ARIA-E (edema) occurred in 8.5% of patients in Arm A (mostly asymptomatic, detected via MRI monitoring).
+   - Infusion-related reactions occurred in 4.2% of Arm A patients, all classified as mild to moderate.
+
+Conclusion:
+Phase III clinical results show that GNT-889 successfully clears amyloid-beta plaques and significantly slows cognitive decline in early Alzheimer's disease with an acceptable safety profile.
+References:
+[1] Global Neuro-Therapeutics. Phase III Trial Data of Solanezumab-Beta. GNT Clinical Reports, 2026.
+[2] National Institute on Aging. Amyloid hypothesis and monoclonal antibodies in AD. NIA Research Journal, 2025.
