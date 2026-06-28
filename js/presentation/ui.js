@@ -256,6 +256,35 @@ class UIController {
         this.deckRenderer.exportHtmlDeck();
       });
     }
+
+    // Print Clinical Case Report trigger
+    const btnPrintReport = document.getElementById('btn-print-report');
+    if (btnPrintReport) {
+      btnPrintReport.addEventListener('click', () => {
+        this.printClinicalReport();
+      });
+    }
+
+    // Interactive Text Selection listeners
+    if (this.docBody) {
+      this.docBody.addEventListener('mouseup', () => {
+        this.handleTextSelection();
+      });
+      // Hide selection badge on click elsewhere
+      document.addEventListener('mousedown', (e) => {
+        const badge = document.getElementById('text-selection-badge');
+        if (badge && !badge.contains(e.target) && e.target !== this.docBody) {
+          badge.style.display = 'none';
+        }
+      });
+    }
+
+    const selBadge = document.getElementById('text-selection-badge');
+    if (selBadge) {
+      selBadge.addEventListener('click', () => {
+        this.askAboutSelection();
+      });
+    }
   }
 
   // API verification controller
@@ -819,16 +848,25 @@ class UIController {
     window.speechSynthesis.speak(utterance);
   }
 
-  // Generates 6 dialogue turns based on active document context
+  // Generates 6 dialogue turns based on active document context and selected style
   async generatePodcastDialogue(doc) {
+    const topicStyle = document.getElementById('podcast-style-select')?.value || 'technical';
+    
     if (!this.apiKey) {
-      return this.getFallbackPodcastDialogue(doc.name, doc.text);
+      return this.getFallbackPodcastDialogue(doc.name, doc.text, topicStyle);
     }
+
+    const stylePrompts = {
+      technical: "Write in the style of Clinical Rounds (Technical). Use exact scientific metrics, biomarkers, trial terminology, and clinical pathways.",
+      layman: "Write in the style of Patient Consultation (Layman). Use easy-to-understand analogies, metaphors, and focus on simple terms, symptoms, and prognosis.",
+      debate: "Write in the style of Peer Review (Skeptical Debate). Host Sarah focuses on the positive findings and endpoints, while Dr. James acts as the skeptic, questioning safety flags, sample sizes, and limitations."
+    };
 
     const systemInstruction = 
       "You are a clinical podcast scriptwriter. Generate an interactive 6-turn dialogue script between Dr. Sarah (host) " +
       "and Dr. James (expert neurologist/clinician) reviewing the case study. Dr. Sarah initiates. " +
       "Dr. James explains diagnostic scores and drug schedules. Dr. Sarah wraps up. " +
+      `${stylePrompts[topicStyle]} ` +
       "Output MUST match the JSON schema strictly.";
 
     const prompt = 
@@ -857,38 +895,283 @@ class UIController {
       return res.dialogue || [];
     } catch (e) {
       console.error("Failed to generate dialogue script, using fallback", e);
-      return this.getFallbackPodcastDialogue(doc.name, doc.text);
+      return this.getFallbackPodcastDialogue(doc.name, doc.text, topicStyle);
     }
   }
 
-  // Deterministic fallback script dialogue mapping
-  getFallbackPodcastDialogue(docName, text) {
-    if (docName.toLowerCase().includes('retinopathy')) {
-      return [
-        { speaker: 'sarah', text: "Hello everyone, welcome back to Clinical Studio. Today James and I are unpacking a highly complex case of Proliferative Diabetic Retinopathy." },
-        { speaker: 'james', text: "That is right, Sarah. The subject is a 58-year-old female with Type 2 Diabetes for fifteen years, presenting with significant macular edema." },
-        { speaker: 'sarah', text: "Yes, and the central subfield thickness on OCT was four hundred and fifty micrometers in the left eye. That calls for immediate treatment." },
-        { speaker: 'james', text: "Indeed, the intervention strategy calls for intravitreal injections of Aflibercept and targeted laser photocoagulation." },
-        { speaker: 'sarah', text: "And we shouldn't forget systemic glycemic optimizations, targets are set at HbA1c below seven percent." },
-        { speaker: 'james', text: "Exactly, managing local vascular leakage and systemic metabolic control together is the key to preventing permanent vision loss." }
-      ];
-    } else if (docName.toLowerCase().includes('alzheimer') || docName.toLowerCase().includes('solanezumab')) {
-      return [
-        { speaker: 'sarah', text: "Welcome back, team. Today we are breaking down the Phase Three trials of Solanezumab-Beta, also known as GNT-889, for early Alzheimer's." },
-        { speaker: 'james', text: "This is a big study, Sarah. One thousand two hundred participants, double-blind testing, targeting early cognitive decline." },
-        { speaker: 'sarah', text: "The primary metrics showed a thirty-two percent slower rate of cognitive decline compared to placebo. That is statistically significant!" },
-        { speaker: 'james', text: "It is! Also, Amyloid PET scans showed a forty-five percent reduction in brain amyloid plaque burden." },
-        { speaker: 'sarah', text: "What about secondary safety warnings? There were mentions of ARIA-E occurrences." },
-        { speaker: 'james', text: "Yes, Amyloid-Related abnormalities were detected in eight point five percent of patients. Most were asymptomatic but require close MRI observation." }
-      ];
-    } else {
-      return [
-        { speaker: 'sarah', text: "Welcome back to Clinical Studio. We are reviewing the clinical highlights of the newly uploaded patient study documents." },
-        { speaker: 'james', text: "It is an interesting study, Sarah. The records detail active diagnostics, patient indicators, and a treatment plan." },
-        { speaker: 'sarah', text: "Absolutely, and the chatbot shows several references to drug dosage schedules and target interventions." },
-        { speaker: 'james', text: "Right, checking clinical highlights, safety, and systemic alignment will yield optimal patient outcomes." }
-      ];
+  // Deterministic fallback script dialogue mapping with Style Selector support
+  getFallbackPodcastDialogue(docName, text, style) {
+    const isRetinopathy = docName.toLowerCase().includes('retinopathy');
+    
+    if (isRetinopathy) {
+      if (style === 'layman') {
+        return [
+          { speaker: 'sarah', text: "Welcome back, listeners. Today James and I are talking about a patient experiencing serious vision issues due to long-term diabetes." },
+          { speaker: 'james', text: "Yes, Sarah. Diabetes can weaken the tiny blood vessels in the back of the eye, causing fluid leakages. That is called macular edema." },
+          { speaker: 'sarah', text: "Right, like a sponge absorbing excess water. The scans show significant swelling, causing her eyesight to drop in the left eye." },
+          { speaker: 'james', text: "Our plan is to use medicine injections directly into the eye to stop the leaks, and a quick laser procedure to stabilize the blood vessels." },
+          { speaker: 'sarah', text: "Also, working with her doctor to keep blood sugar under control is crucial so the eyes can heal." },
+          { speaker: 'james', text: "Absolutely. With consistent checkups and managing blood sugar, we can protect her sight and prevent blindness." }
+        ];
+      } else if (style === 'debate') {
+        return [
+          { speaker: 'sarah', text: "Let's debate the treatment protocol for this diabetic retinopathy patient. Aflibercept injections are scheduled, which looks promising." },
+          { speaker: 'james', text: "It is standard of care, Sarah, but let's look at the systemic metrics. Her HbA1c is at eight point seven percent. Injections alone are just a temporary bandage." },
+          { speaker: 'sarah', text: "True, but local neovascular glaucoma risk OS is extremely high. Panretinal photocoagulation cannot wait for endocrine optimization." },
+          { speaker: 'james', text: "I agree, but we must emphasize that laser photocoagulation will reduce peripheral vision. The patient must be counseled on this trade-off." },
+          { speaker: 'sarah', text: "A fair point. Laser reduces oxygen demand, but limits night vision. A combined treat-and-extend injection model is safer." },
+          { speaker: 'james', text: "Exactly. Injections preserve fields, while laser prevents massive bleedings. Both must align with intensive glycemic controls." }
+        ];
+      } else { // technical default
+        return [
+          { speaker: 'sarah', text: "Hello everyone, welcome back to Clinical Studio. Today James and I are unpacking a highly complex case of Proliferative Diabetic Retinopathy." },
+          { speaker: 'james', text: "That is right, Sarah. The subject is a 58-year-old female with Type 2 Diabetes for fifteen years, presenting with significant macular edema." },
+          { speaker: 'sarah', text: "Yes, and the central subfield thickness on OCT was four hundred and fifty micrometers in the left eye. That calls for immediate treatment." },
+          { speaker: 'james', text: "Indeed, the intervention strategy calls for intravitreal injections of Aflibercept and targeted laser photocoagulation." },
+          { speaker: 'sarah', text: "And we shouldn't forget systemic glycemic optimizations, targets are set at HbA1c below seven percent." },
+          { speaker: 'james', text: "Exactly, managing local vascular leakage and systemic metabolic control together is the key to preventing permanent vision loss." }
+        ];
+      }
+    } else { // Alzheimer's/Default
+      if (style === 'layman') {
+        return [
+          { speaker: 'sarah', text: "Hi everyone. Today we are discussing a new drug trial called GNT-eight-eight-nine, designed to clear brain plaques in Alzheimer's." },
+          { speaker: 'james', text: "Alzheimer's is characterized by sticky protein plaques building up in the brain. This drug acts like a targeted cleaner to remove them." },
+          { speaker: 'sarah', text: "The results showed a thirty-two percent slower rate of memory decline over a year. That is a noticeable difference for families." },
+          { speaker: 'james', text: "It is, Sarah. Plaque scans dropped by nearly half, indicating the drug is doing its molecular job." },
+          { speaker: 'sarah', text: "Are there side effects? We heard about brain swelling concerns." },
+          { speaker: 'james', text: "Yes, minor swelling was noticed in some patients, though most did not feel anything. Regular brain scans are critical to ensure safety." }
+        ];
+      } else if (style === 'debate') {
+        return [
+          { speaker: 'sarah', text: "The Phase Three trial of this new Alzheimer's monoclonal antibody shows remarkable amyloid clearance." },
+          { speaker: 'james', text: "Clearance is proven, Sarah, but look at the clinical endpoint correlation. A thirty-two percent slower decline on ADAS-Cog is modest at best in daily life." },
+          { speaker: 'sarah', text: "But downstream biomarkers like CSF tau also decreased, proving neuroprotective impact." },
+          { speaker: 'james', text: "True, but eight point five percent of patients experienced ARIA-E swelling. That requires rigorous, expensive MRI monitoring." },
+          { speaker: 'sarah', text: "The safety profile is manageable. Mild infusion reactions and asymptomatic ARIA-E are acceptable for a terminal disease." },
+          { speaker: 'james', text: "Perhaps, but cost-benefit ratios and accessibility of monoclonal antibody infusions remain major clinical roadblocks." }
+        ];
+      } else { // technical default
+        return [
+          { speaker: 'sarah', text: "Welcome back, team. Today we are breaking down the Phase Three trials of Solanezumab-Beta, also known as GNT-889, for early Alzheimer's." },
+          { speaker: 'james', text: "This is a big study, Sarah. One thousand two hundred participants, double-blind testing, targeting early cognitive decline." },
+          { speaker: 'sarah', text: "The primary metrics showed a thirty-two percent slower rate of cognitive decline compared to placebo. That is statistically significant!" },
+          { speaker: 'james', text: "It is! Also, Amyloid PET scans showed a forty-five percent reduction in brain amyloid plaque burden." },
+          { speaker: 'sarah', text: "What about secondary safety warnings? There were mentions of ARIA-E occurrences." },
+          { speaker: 'james', text: "Yes, Amyloid-Related abnormalities were detected in eight point five percent of patients. Most were asymptomatic but require close MRI observation." }
+        ];
+      }
     }
+  }
+
+  // INTERACTIVE TEXT SELECTION EXPLATOR
+  handleTextSelection() {
+    const selection = window.getSelection();
+    const selectedText = selection.toString().trim();
+    const badge = document.getElementById('text-selection-badge');
+    const preview = document.getElementById('selected-text-preview');
+    
+    if (selectedText.length > 2 && selectedText.length < 50) {
+      const range = selection.getRangeAt(0);
+      const rect = range.getBoundingClientRect();
+      
+      preview.textContent = selectedText;
+      badge.style.display = 'flex';
+      badge.style.left = `${rect.left + window.scrollX + (rect.width / 2) - 60}px`;
+      badge.style.top = `${rect.top + window.scrollY - 42}px`;
+    } else {
+      if (badge) badge.style.display = 'none';
+    }
+  }
+
+  askAboutSelection() {
+    const selection = window.getSelection();
+    const selectedText = selection.toString().trim();
+    const badge = document.getElementById('text-selection-badge');
+    
+    if (selectedText) {
+      if (badge) badge.style.display = 'none';
+      selection.removeAllRanges();
+      
+      if (this.chatInput) {
+        this.chatInput.value = `Explain the clinical significance of the term "${selectedText}" in the context of this study.`;
+        this.chatInput.focus();
+        this.submitUserQuery();
+      }
+    }
+  }
+
+  // PRINTABLE CLINICAL SUMMARY REPORT GENERATOR
+  printClinicalReport() {
+    const doc = window.documentStorage.getActiveDocument();
+    if (!doc) {
+      alert("No active case file selected. Load a document to print the report.");
+      return;
+    }
+
+    const printWindow = window.open('', '_blank');
+    
+    // Gathers clinical coding nodes
+    let codingHtml = '';
+    const graphNodes = this.graphRenderer.nodes || [];
+    if (graphNodes.length > 0) {
+      codingHtml = `
+        <h2>Standardized Medical Coding Map</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Clinical Entity</th>
+              <th>Category</th>
+              <th>Medical Identifier (ICD-10 / RxNorm)</th>
+            </tr>
+          </thead>
+          <tbody>
+      `;
+      
+      const MEDICAL_CODES = {
+        'proliferative diabetic retinopathy': 'ICD-10-CM: E11.359',
+        'diabetic retinopathy': 'ICD-10-CM: E11.319',
+        'macular edema': 'ICD-10-CM: H35.81',
+        'alzheimer\'s disease': 'ICD-10-CM: G30.9',
+        'essential hypertension': 'ICD-10-CM: I10',
+        'hyperlipidemia': 'ICD-10-CM: E78.5',
+        'neovascular glaucoma': 'ICD-10-CM: H40.59',
+        'vitreous hemorrhage': 'ICD-10-CM: H43.13',
+        'diabetic macular edema': 'ICD-10-CM: E11.351',
+        'mild cognitive impairment': 'ICD-10-CM: G31.84',
+        'aflibercept': 'RxNorm: 1150495',
+        'eylea': 'RxNorm: 1150495',
+        'lisinopril': 'RxNorm: 29046',
+        'atorvastatin': 'RxNorm: 83367',
+        'solanezumab-beta': 'RxNorm: 1443577',
+        'gnt-889': 'RxNorm: 1443577',
+      };
+
+      graphNodes.forEach(node => {
+        const lookup = node.label.toLowerCase().trim();
+        const matchedKey = Object.keys(MEDICAL_CODES).find(k => lookup.includes(k) || k.includes(lookup));
+        const code = matchedKey ? MEDICAL_CODES[matchedKey] : 'Not Coded';
+        codingHtml += `
+          <tr>
+            <td><strong>${node.label}</strong></td>
+            <td>${node.type.toUpperCase()}</td>
+            <td><code>${code}</code></td>
+          </tr>
+        `;
+      });
+      codingHtml += `</tbody></table>`;
+    }
+
+    // Gathers Slide summaries
+    let slidesHtml = '';
+    const slides = this.deckRenderer.slides || [];
+    if (slides.length > 0) {
+      slidesHtml = `<h2>Clinical Summary Presentation Slides</h2>`;
+      slides.forEach((slide, i) => {
+        const bullets = slide.bulletPoints.map(p => `<li>${p}</li>`).join('');
+        slidesHtml += `
+          <div class="slide-block">
+            <h3>Slide ${i+1}: [${slide.category}] ${slide.title}</h3>
+            <ul>${bullets}</ul>
+          </div>
+        `;
+      });
+    }
+
+    // Build print window html structure
+    printWindow.document.write(`
+      <html>
+      <head>
+        <title>Clinical Summary Report: ${doc.name}</title>
+        <style>
+          body {
+            font-family: Arial, sans-serif;
+            line-height: 1.5;
+            color: #333;
+            padding: 40px;
+          }
+          h1 {
+            font-size: 24px;
+            font-weight: bold;
+            border-bottom: 2px solid #000;
+            padding-bottom: 8px;
+            margin-bottom: 4px;
+            text-transform: uppercase;
+          }
+          .subheading {
+            font-size: 11px;
+            color: #666;
+            margin-bottom: 30px;
+            letter-spacing: 1px;
+          }
+          h2 {
+            font-size: 18px;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 6px;
+            margin-top: 30px;
+          }
+          table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+          }
+          th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+            font-size: 13px;
+          }
+          th {
+            background-color: #f5f5f5;
+          }
+          .slide-block {
+            margin-bottom: 20px;
+            padding: 10px 15px;
+            background: #fafafa;
+            border-left: 3px solid #00f2fe;
+          }
+          code {
+            background: #eee;
+            padding: 2px 5px;
+            border-radius: 4px;
+            font-family: monospace;
+          }
+          .doc-text {
+            white-space: pre-wrap;
+            font-size: 13px;
+            background: #fafafa;
+            padding: 15px;
+            border: 1px solid #ddd;
+          }
+          @media print {
+            body { padding: 0; }
+            button { display: none; }
+          }
+        </style>
+      </head>
+      <body>
+        <h1>HealTab Medical Intelligence System</h1>
+        <div class="subheading">CLINICAL ANALYSIS & GROUNDED SYNTHESIS SUMMARY REPORT</div>
+        
+        <p><strong>Source Document:</strong> ${doc.name}</p>
+        <p><strong>Analysis Timestamp:</strong> ${new Date().toLocaleString()}</p>
+        
+        ${codingHtml}
+        ${slidesHtml}
+        
+        <h2>Full Source Case File</h2>
+        <div class="doc-text">${doc.text}</div>
+        
+        <script>
+          window.onload = function() {
+            window.print();
+          };
+        </script>
+      </body>
+      </html>
+    `);
+    
+    printWindow.document.close();
   }
 }
 
@@ -897,4 +1180,5 @@ document.addEventListener('DOMContentLoaded', () => {
   window.uiController = new UIController();
   window.uiController.init();
 });
+
 

@@ -105,6 +105,9 @@
           <button class="tab-btn" data-tab="podcast">🎙️ Podcast Study</button>
         </div>
         <div class="header-actions">
+          <button id="btn-print-report" class="theme-toggle-btn" style="width: auto; padding: 0 12px; font-size: 12px; font-weight: 600; color: var(--accent-cyan); display: flex; align-items: center; gap: 6px;" title="Print Clinical Summary Report">
+            📄 Print Report
+          </button>
           <button id="theme-toggle" class="theme-toggle-btn" title="Toggle Light/Dark Mode">☀️</button>
         </div>
       </div>
@@ -202,7 +205,16 @@
           <div style="display: flex; flex-direction: column; height: 100%; padding: 24px; align-items: center; justify-content: center; overflow: hidden; gap: 24px;">
             <div style="text-align: center; max-width: 600px;">
               <h2 style="font-size: 24px; font-weight: 700; margin-bottom: 8px; background: var(--grad-cyan-blue); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Clinical Podcast Studio</h2>
-              <p style="font-size: 13.5px; color: var(--text-secondary); line-height: 1.5;">Listen to a simulated, interactive clinical brief between senior director <strong>Dr. Sarah</strong> and lead neurologist <strong>Dr. James</strong> reviewing your clinical files.</p>
+              <p style="font-size: 13.5px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 12px;">Listen to a simulated, interactive clinical brief between senior director <strong>Dr. Sarah</strong> and lead neurologist <strong>Dr. James</strong> reviewing your clinical files.</p>
+              
+              <div style="margin-bottom: 4px; display: flex; align-items: center; gap: 8px; justify-content: center;">
+                <label style="font-size: 12px; color: var(--text-secondary); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Topic Mode:</label>
+                <select id="podcast-style-select" style="background: var(--bg-secondary); border: 1px solid var(--glass-border); color: var(--text-primary); padding: 6px 12px; border-radius: var(--radius-md); outline: none; font-size: 12px; cursor: pointer; transition: border-color 0.2s;">
+                  <option value="technical">🔬 Clinical Rounds (Technical)</option>
+                  <option value="layman">🌱 Patient Consultation (Layman)</option>
+                  <option value="debate">⚔️ Peer Review (Skeptical Debate)</option>
+                </select>
+              </div>
             </div>
             
             <!-- Player Card -->
@@ -297,5 +309,9 @@
   <script src="js/presentation/graph_renderer.js"></script>
   <script src="js/presentation/deck_renderer.js"></script>
   <script src="js/presentation/ui.js"></script>
+  <!-- Floating Text Selection Explainer Badge -->
+  <div id="text-selection-badge" style="display: none; position: absolute; z-index: 1000; background: var(--grad-cyan-blue); color: #fff; padding: 8px 14px; border-radius: 20px; font-size: 11.5px; font-weight: 600; cursor: pointer; box-shadow: 0 4px 15px rgba(0, 242, 254, 0.35); border: 1px solid rgba(255,255,255,0.15); align-items: center; justify-content: center; gap: 6px; pointer-events: auto; user-select: none;">
+    🔬 Ask AI about "<span id="selected-text-preview" style="max-width: 100px; display: inline-block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; vertical-align: bottom;"></span>"
+  </div>
 </body>
 </html>

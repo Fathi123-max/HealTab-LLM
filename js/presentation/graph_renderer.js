@@ -293,10 +293,47 @@ class GraphRenderer {
 
     this.detailTitle.textContent = node.label;
     this.detailTitle.style.color = this.getNodeColor(node.type);
+    
+    // Medical Code Mapping Table lookup
+    const lookupKey = node.label.toLowerCase().trim();
+    const MEDICAL_CODES = {
+      'proliferative diabetic retinopathy': { code: 'ICD-10-CM: E11.359', type: 'Diagnosis' },
+      'diabetic retinopathy': { code: 'ICD-10-CM: E11.319', type: 'Diagnosis' },
+      'macular edema': { code: 'ICD-10-CM: H35.81', type: 'Diagnosis' },
+      'alzheimer\'s disease': { code: 'ICD-10-CM: G30.9', type: 'Diagnosis' },
+      'essential hypertension': { code: 'ICD-10-CM: I10', type: 'Diagnosis' },
+      'hyperlipidemia': { code: 'ICD-10-CM: E78.5', type: 'Diagnosis' },
+      'neovascular glaucoma': { code: 'ICD-10-CM: H40.59', type: 'Diagnosis' },
+      'vitreous hemorrhage': { code: 'ICD-10-CM: H43.13', type: 'Diagnosis' },
+      'diabetic macular edema': { code: 'ICD-10-CM: E11.351', type: 'Diagnosis' },
+      'mild cognitive impairment': { code: 'ICD-10-CM: G31.84', type: 'Diagnosis' },
+      'aflibercept': { code: 'RxNorm: 1150495', type: 'Drug' },
+      'eylea': { code: 'RxNorm: 1150495', type: 'Drug' },
+      'lisinopril': { code: 'RxNorm: 29046', type: 'Drug' },
+      'atorvastatin': { code: 'RxNorm: 83367', type: 'Drug' },
+      'solanezumab-beta': { code: 'RxNorm: 1443577', type: 'Drug' },
+      'gnt-889': { code: 'RxNorm: 1443577', type: 'Drug' },
+    };
+
+    let codeHtml = '';
+    const matchedKey = Object.keys(MEDICAL_CODES).find(k => lookupKey.includes(k) || k.includes(lookupKey));
+    if (matchedKey) {
+      const info = MEDICAL_CODES[matchedKey];
+      const isDrug = info.type === 'Drug';
+      const badgeStyle = isDrug 
+        ? "background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3);" 
+        : "background: rgba(139, 92, 246, 0.15); color: #8b5cf6; border: 1px solid rgba(139, 92, 246, 0.3);";
+      
+      codeHtml = `<div style="margin-bottom: 12px; padding: 6px 10px; border-radius: var(--radius-sm); font-size: 11px; font-weight: 700; display: inline-block; ${badgeStyle}">${info.code} (${info.type})</div>`;
+    }
+
     this.detailBody.innerHTML = `
-      <strong>Entity Type:</strong> ${node.type.toUpperCase()}<br><br>
-      <strong>Description & Context:</strong><br>
-      ${node.details}
+      ${codeHtml}
+      <div style="font-size:12.5px; color:var(--text-secondary); line-height:1.5;">
+        <strong>Entity Type:</strong> ${node.type.toUpperCase()}<br><br>
+        <strong>Description & Context:</strong><br>
+        ${node.details}
+      </div>
     `;
     this.selectedNodeId = node.id;
     this.selectedNodeLabel = node.label;
