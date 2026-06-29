@@ -5,15 +5,20 @@ import { Card, CardContent } from './ui/card';
 interface CaseReaderProps {
   activeDoc: DocumentItem | null;
   onAskAboutTerm: (term: string) => void;
+  currentPage: number;
+  onPageChange: (page: number) => void;
 }
 
-export default function CaseReader({ activeDoc, onAskAboutTerm }: CaseReaderProps) {
-  const [currentPage, setCurrentPage] = useState<number>(1);
+export default function CaseReader({ 
+  activeDoc, 
+  onAskAboutTerm,
+  currentPage,
+  onPageChange
+}: CaseReaderProps) {
   const [selectionBox, setSelectionBox] = useState<{ x: number; y: number; text: string } | null>(null);
   const bodyRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    setCurrentPage(1);
     setSelectionBox(null);
   }, [activeDoc]);
 
@@ -94,27 +99,27 @@ export default function CaseReader({ activeDoc, onAskAboutTerm }: CaseReaderProp
   const activePage = activeDoc.pages.find(p => p.pageNum === currentPage) || activeDoc.pages[0];
 
   return (
-    <div className="flex flex-col h-full p-6 gap-4 overflow-hidden relative">
-      <div className="flex items-center justify-between border-b border-white/5 pb-4">
+    <div className="flex flex-col h-full p-4 sm:p-6 gap-3 sm:gap-4 overflow-hidden relative">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-[var(--border-color)] pb-4 gap-3">
         <div>
-          <h2 className="text-lg font-bold text-white tracking-tight">{activeDoc.name}</h2>
-          <span className="text-xs text-slate-400">Format: {activeDoc.type} • Pages: {activeDoc.pages.length}</span>
+          <h2 className="text-lg font-bold text-[var(--text-primary)] tracking-tight">{activeDoc.name}</h2>
+          <span className="text-xs text-[var(--text-secondary)]">Format: {activeDoc.type} • Pages: {activeDoc.pages.length}</span>
         </div>
         
         {activeDoc.pages.length > 1 && (
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 shrink-0">
             <button
-              onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+              onClick={() => onPageChange(Math.max(currentPage - 1, 1))}
               disabled={currentPage === 1}
-              className="px-3 py-1 text-xs font-semibold bg-white/5 border border-white/10 rounded-md text-white hover:bg-white/10 disabled:opacity-40"
+              className="px-3 py-1 text-xs font-semibold bg-white/5 border border-[var(--border-color)] rounded-md text-[var(--text-primary)] hover:bg-white/10 disabled:opacity-40"
             >
               &larr; Prev
             </button>
-            <span className="text-xs font-semibold text-slate-300">Page {currentPage} of {activeDoc.pages.length}</span>
+            <span className="text-xs font-semibold text-[var(--text-secondary)]">Page {currentPage} of {activeDoc.pages.length}</span>
             <button
-              onClick={() => setCurrentPage(prev => Math.min(prev + 1, activeDoc.pages.length))}
+              onClick={() => onPageChange(Math.min(currentPage + 1, activeDoc.pages.length))}
               disabled={currentPage === activeDoc.pages.length}
-              className="px-3 py-1 text-xs font-semibold bg-white/5 border border-white/10 rounded-md text-white hover:bg-white/10 disabled:opacity-40"
+              className="px-3 py-1 text-xs font-semibold bg-white/5 border border-[var(--border-color)] rounded-md text-[var(--text-primary)] hover:bg-white/10 disabled:opacity-40"
             >
               Next &rarr;
             </button>
@@ -123,24 +128,24 @@ export default function CaseReader({ activeDoc, onAskAboutTerm }: CaseReaderProp
       </div>
 
       {/* EHR Clinical Stats Dashboard */}
-      <div className="grid grid-cols-4 gap-4 mt-2">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mt-1 sm:mt-2 shrink-0">
         {getDashboardMetrics().map((m, idx) => (
-          <div key={idx} className={`p-4 rounded-xl bg-slate-950/45 border-l-4 border border-white/5 shadow-lg backdrop-blur-xl ${m.color.split(' ')[0]}`}>
-            <span className="text-[10px] uppercase font-bold tracking-wider text-slate-500 block mb-1">
+          <div key={idx} className={`p-4 rounded-xl bg-[var(--card-bg)] border-l-4 border border-[var(--border-color)] shadow-lg backdrop-blur-xl ${m.color.split(' ')[0]}`}>
+            <span className="text-[10px] uppercase font-bold tracking-wider text-[var(--text-secondary)] block mb-1">
               {m.label}
             </span>
             <div className={`text-base font-extrabold tracking-tight ${m.color.split(' ')[1]}`}>
               {m.val}
             </div>
-            <span className="text-[9px] text-slate-400 font-semibold block mt-1">
+            <span className="text-[9px] text-[var(--text-secondary)] font-semibold block mt-1">
               {m.change}
             </span>
           </div>
         ))}
       </div>
 
-      <Card className="flex-1 bg-slate-950/45 border-white/5 shadow-2xl backdrop-blur-xl overflow-y-auto">
-        <CardContent className="p-8 leading-relaxed text-sm text-slate-200 whitespace-pre-wrap select-text" ref={bodyRef}>
+      <Card className="flex-1 bg-[var(--card-bg)] border-[var(--border-color)] shadow-2xl backdrop-blur-xl overflow-y-auto min-h-0">
+        <CardContent className="p-4 sm:p-8 leading-relaxed text-sm text-[var(--text-primary)] whitespace-pre-wrap select-text" ref={bodyRef}>
           {activePage ? activePage.text : activeDoc.text}
         </CardContent>
       </Card>

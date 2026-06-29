@@ -120,14 +120,14 @@ export default function AgentChat({
   ];
 
   return (
-    <Card className="flex flex-col h-full bg-slate-950/45 border-none shadow-2xl rounded-none">
+    <Card className="flex flex-col h-full bg-[var(--card-bg)] border-none shadow-2xl rounded-none">
       {/* Header */}
-      <div className="p-4 border-b border-white/5 flex items-center justify-between">
+      <div className="p-4 border-b border-[var(--border-color)] flex items-center justify-between">
         <div className="flex items-center gap-2">
           <span className="text-cyan-400 font-bold text-lg select-none">🤖</span>
           <div>
-            <h2 className="text-xs font-bold text-white tracking-wide uppercase">HealTab AI Agent</h2>
-            <span className="text-[10px] text-slate-400">Grounded Medical Companion</span>
+            <h2 className="text-xs font-bold text-[var(--text-primary)] tracking-wide uppercase">HealTab AI Agent</h2>
+            <span className="text-[10px] text-[var(--text-secondary)]">Grounded Medical Companion</span>
           </div>
         </div>
       </div>
@@ -145,20 +145,20 @@ export default function AgentChat({
               className={`p-3.5 rounded-2xl text-xs leading-relaxed ${
                 msg.role === 'user'
                   ? 'bg-gradient-to-r from-cyan-500 to-indigo-500 text-white rounded-br-none shadow-md shadow-cyan-500/10'
-                  : 'bg-slate-900 border border-white/5 text-slate-200 rounded-bl-none'
+                  : 'bg-[var(--chat-msg-ai)] border border-[var(--border-color)] text-[var(--text-primary)] rounded-bl-none'
               }`}
             >
               {formatMessageText(msg.text)}
 
               {/* Render Citations */}
               {msg.citations && msg.citations.length > 0 && (
-                <div className="mt-3 pt-2 border-t border-white/5 flex flex-wrap gap-1.5 items-center">
-                  <span className="text-[9px] text-slate-500 font-bold uppercase mr-1">Citations:</span>
+                <div className="mt-3 pt-2 border-t border-[var(--border-color)] flex flex-wrap gap-1.5 items-center">
+                  <span className="text-[9px] text-[var(--text-secondary)] font-bold uppercase mr-1">Citations:</span>
                   {msg.citations.map((cit, idx) => (
                     <button
                       key={idx}
                       onClick={() => onNavigateCitation(cit.docId, cit.pageNum)}
-                      className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-cyan-500/10 text-cyan-400 border border-cyan-500/25 hover:bg-cyan-500/20 active:scale-95 transition-all"
+                      className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-cyan-500/10 text-cyan-400 border border-cyan-500/25 hover:bg-cyan-500/20 active:scale-95 transition-all cursor-pointer"
                     >
                       Ref [p.{cit.pageNum}]
                     </button>
@@ -167,7 +167,7 @@ export default function AgentChat({
               )}
             </div>
 
-            <div className="flex items-center gap-1.5 text-[9px] text-slate-500 font-medium px-1">
+            <div className="flex items-center gap-1.5 text-[9px] text-[var(--text-secondary)] font-medium px-1">
               <span>{msg.role === 'user' ? 'Clinician' : 'HealTab AI'}</span>
               <span>•</span>
               {msg.role === 'ai' && (
@@ -187,25 +187,25 @@ export default function AgentChat({
 
         {isGenerating && (
           <div className="flex flex-col max-w-[80%] mr-auto items-start gap-1">
-            <div className="p-3.5 rounded-2xl bg-slate-900 border border-white/5 flex gap-1 items-center rounded-bl-none">
+            <div className="p-3.5 rounded-2xl bg-[var(--chat-msg-ai)] border border-[var(--border-color)] flex gap-1 items-center rounded-bl-none">
               <div className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce [animation-delay:-0.3s]"></div>
               <div className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce [animation-delay:-0.15s]"></div>
               <div className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce"></div>
             </div>
-            <span className="text-[9px] text-slate-500 px-1 font-bold">HealTab AI is thinking...</span>
+            <span className="text-[9px] text-[var(--text-secondary)] px-1 font-bold">HealTab AI is thinking...</span>
           </div>
         )}
         <div ref={messagesEndRef} />
       </div>
 
       {/* Suggestion Chips */}
-      <div className="px-4 py-2 border-t border-white/5 flex flex-wrap gap-1.5">
+      <div className="px-4 py-2 border-t border-[var(--border-color)] flex flex-wrap gap-1.5">
         {suggestionChips.map((chip, idx) => (
           <button
             key={idx}
             onClick={() => onSendMessage(chip.prompt)}
             disabled={isGenerating}
-            className="text-[10px] px-2.5 py-1 rounded-full border border-white/5 bg-slate-900/60 text-slate-400 hover:text-white hover:border-cyan-400/25 hover:bg-slate-900 active:scale-95 disabled:opacity-40 transition-all select-none"
+            className="text-[10px] px-2.5 py-1 rounded-full border border-[var(--input-border)] bg-[var(--input-bg)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-cyan-400/25 hover:bg-[var(--input-bg)] active:scale-95 disabled:opacity-40 transition-all select-none cursor-pointer"
           >
             {chip.label}
           </button>
@@ -213,7 +213,7 @@ export default function AgentChat({
       </div>
 
       {/* Input */}
-      <div className="p-4 border-t border-white/5 flex items-center gap-3 bg-slate-950/60">
+      <div className="p-4 border-t border-[var(--border-color)] flex items-center gap-3 bg-[var(--header-bg)]">
         <div className="flex-1 relative flex items-center">
           <Input
             value={inputText}
@@ -221,11 +221,11 @@ export default function AgentChat({
             onKeyDown={handleKeyDown}
             placeholder={isListening ? "Listening dictation..." : "Ask about clinical case parameters..."}
             disabled={isGenerating}
-            className="w-full bg-slate-900 border-white/10 text-white rounded-full pl-4 pr-10 py-5 text-xs focus-visible:ring-0 focus-visible:ring-offset-0 focus:border-cyan-400/50"
+            className="w-full bg-[var(--input-bg)] border-[var(--input-border)] text-[var(--text-primary)] rounded-full pl-4 pr-10 py-5 text-xs focus-visible:ring-0 focus-visible:ring-offset-0 focus:border-cyan-400/50"
           />
           <button
             onClick={toggleSpeechRecognition}
-            className={`absolute right-3.5 text-sm p-1 rounded-full text-slate-400 hover:text-white transition-colors cursor-pointer select-none ${
+            className={`absolute right-3.5 text-sm p-1 rounded-full text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors cursor-pointer select-none ${
               isListening ? 'animate-pulse text-red-500 scale-110' : ''
             }`}
             title="Dictate Query (Voice Input)"

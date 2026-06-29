@@ -243,19 +243,19 @@ export default function SummarySlides({ slides, onSaveSlides }: SummarySlidesPro
   };
 
   return (
-    <div className="flex h-full p-6 gap-6 overflow-hidden">
+    <div className="flex flex-col lg:flex-row h-full p-4 lg:p-6 gap-4 lg:gap-6 overflow-y-auto lg:overflow-hidden">
       {/* Slide Visual Area */}
-      <div className="flex-1 flex flex-col items-center justify-between overflow-hidden">
-        <Card className={`w-full aspect-[16/9] ${getThemeClass(theme)} shadow-2xl relative p-12 flex flex-col justify-center transition-all duration-300`}>
+      <div className="w-full lg:flex-1 flex flex-col items-center justify-between gap-4 shrink-0">
+        <Card className={`w-full aspect-[16/9] ${getThemeClass(theme)} shadow-2xl relative p-6 sm:p-12 flex flex-col justify-center transition-all duration-300`}>
           <CardContent className="p-0 flex flex-col justify-center height-full">
             <span className="text-[10px] uppercase font-bold tracking-widest text-cyan-400 mb-2">
               {activeSlide.category}
             </span>
-            <h2 className={`text-3xl font-extrabold bg-gradient-to-r ${getTitleColor(theme)} bg-clip-text text-transparent mb-6 tracking-tight leading-snug`}>
+            <h2 className={`text-base sm:text-2xl lg:text-3xl font-extrabold bg-gradient-to-r ${getTitleColor(theme)} bg-clip-text text-transparent mb-3 sm:mb-6 tracking-tight leading-snug`}>
               {activeSlide.title}
             </h2>
-            <div className="text-sm font-medium leading-relaxed">
-              <ul className="list-disc pl-6 space-y-4 text-slate-300">
+            <div className="text-[10px] sm:text-xs lg:text-sm font-medium leading-relaxed">
+              <ul className="list-disc pl-4 sm:pl-6 space-y-1 sm:space-y-4 text-slate-300">
                 {activeSlide.bulletPoints.map((bullet, i) => (
                   <li key={i}>{bullet}</li>
                 ))}
@@ -265,51 +265,53 @@ export default function SummarySlides({ slides, onSaveSlides }: SummarySlidesPro
         </Card>
 
         {/* Presenter Controls */}
-        <div className="flex items-center justify-between w-full mt-4">
-          <button
-            onClick={() => setCurrentIndex(prev => Math.max(prev - 1, 0))}
-            disabled={currentIndex === 0}
-            className="px-4 py-2 text-xs font-semibold bg-white/5 border border-white/10 rounded-md text-white hover:bg-white/10 disabled:opacity-40"
-          >
-            &larr; Back
-          </button>
-          <span className="text-xs font-bold text-slate-400">
-            Slide {currentIndex + 1} of {slides.length}
-          </span>
-          <button
-            onClick={() => setCurrentIndex(prev => Math.min(prev + 1, slides.length - 1))}
-            disabled={currentIndex === slides.length - 1}
-            className="px-4 py-2 text-xs font-semibold bg-white/5 border border-white/10 rounded-md text-white hover:bg-white/10 disabled:opacity-40"
-          >
-            Next &rarr;
-          </button>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between w-full gap-3 sm:gap-4 mt-2 sm:mt-4 shrink-0 bg-[var(--card-bg)] p-3 rounded-lg border border-[var(--border-color)] lg:bg-transparent lg:p-0 lg:border-0">
+          <div className="flex items-center justify-between sm:justify-start gap-4 flex-1">
+            <button
+              onClick={() => setCurrentIndex(prev => Math.max(prev - 1, 0))}
+              disabled={currentIndex === 0}
+              className="px-3.5 py-2 text-xs font-semibold bg-white/5 border border-[var(--border-color)] rounded-md text-[var(--text-primary)] hover:bg-white/10 disabled:opacity-40 cursor-pointer select-none"
+            >
+              &larr; Back
+            </button>
+            <span className="text-xs font-bold text-[var(--text-secondary)]">
+              Slide {currentIndex + 1} of {slides.length}
+            </span>
+            <button
+              onClick={() => setCurrentIndex(prev => Math.min(prev + 1, slides.length - 1))}
+              disabled={currentIndex === slides.length - 1}
+              className="px-3 py-2 text-xs font-semibold bg-white/5 border border-[var(--border-color)] rounded-md text-[var(--text-primary)] hover:bg-white/10 disabled:opacity-40 cursor-pointer select-none"
+            >
+              Next &rarr;
+            </button>
+          </div>
           
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 justify-end sm:flex-initial">
             <button
               onClick={() => setIsFullscreen(true)}
-              className="px-3.5 py-2 text-xs font-bold bg-white/5 border border-white/10 text-white rounded-md hover:bg-white/10 transition-colors"
+              className="px-3.5 py-2 text-xs font-bold bg-white/5 border border-[var(--border-color)] text-[var(--text-primary)] rounded-md hover:bg-white/10 transition-colors cursor-pointer select-none"
             >
               📺 Fullscreen
             </button>
             <button
               onClick={handleExportDeck}
-              className="px-3.5 py-2 text-xs font-bold bg-white/5 border border-white/10 text-cyan-400 rounded-md hover:bg-white/10 transition-colors"
+              className="px-3.5 py-2 text-xs font-bold bg-white/5 border border-[var(--border-color)] text-cyan-400 rounded-md hover:bg-white/10 transition-colors cursor-pointer select-none"
             >
-              📥 Export Slide Deck
+              📥 Export Deck
             </button>
           </div>
         </div>
       </div>
 
       {/* Editor & Stylist Sidebar */}
-      <Card className="w-[300px] bg-slate-950/45 border-white/5 p-6 shadow-2xl backdrop-blur-xl flex flex-col gap-6 overflow-y-auto">
+      <Card className="w-full lg:w-[300px] bg-[var(--card-bg)] border-[var(--border-color)] p-4 lg:p-6 shadow-2xl backdrop-blur-xl flex flex-col gap-4 lg:gap-6 lg:overflow-y-auto min-h-[350px]">
         <div className="flex flex-col gap-2">
-          <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider">Slide Theme</h3>
+          <h3 className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider">Slide Theme</h3>
           <Select value={theme} onValueChange={(val: any) => setTheme(val)}>
-            <SelectTrigger className="bg-slate-900 border-white/10 text-white text-xs">
+            <SelectTrigger className="bg-[var(--input-bg)] border-[var(--input-border)] text-[var(--text-primary)] text-xs">
               <SelectValue placeholder="Theme style..." />
             </SelectTrigger>
-            <SelectContent className="bg-slate-950 border-white/10 text-white text-xs">
+            <SelectContent className="bg-[var(--bg-color)] border-[var(--border-color)] text-[var(--text-primary)] text-xs">
               <SelectItem value="midnight">🌌 Midnight Space</SelectItem>
               <SelectItem value="emerald">💚 Clinical Emerald</SelectItem>
               <SelectItem value="cyber">💜 Cybernetic Glow</SelectItem>
@@ -318,30 +320,30 @@ export default function SummarySlides({ slides, onSaveSlides }: SummarySlidesPro
           </Select>
         </div>
 
-        <div className="flex-1 border-t border-white/5 pt-5 flex flex-col gap-4">
-          <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider">Customizer</h3>
+        <div className="flex-1 border-t border-[var(--border-color)] pt-5 flex flex-col gap-4">
+          <h3 className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider">Customizer</h3>
           
           <div className="flex flex-col gap-1.5">
-            <label className="text-[10px] text-slate-400 uppercase font-bold">Slide Title</label>
+            <label className="text-[10px] text-[var(--text-secondary)] uppercase font-bold">Slide Title</label>
             <Input
               value={editTitle}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEditTitle(e.target.value)}
-              className="bg-slate-900 border-white/10 text-xs text-white"
+              className="bg-[var(--input-bg)] border-[var(--input-border)] text-xs text-[var(--text-primary)]"
             />
           </div>
 
           <div className="flex-grow flex flex-col gap-1.5 min-h-[140px]">
-            <label className="text-[10px] text-slate-400 uppercase font-bold">Bullet Points (One per line)</label>
+            <label className="text-[10px] text-[var(--text-secondary)] uppercase font-bold">Bullet Points (One per line)</label>
             <Textarea
               value={editBullets}
               onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setEditBullets(e.target.value)}
-              className="flex-1 bg-slate-900 border-white/10 text-xs text-white resize-none"
+              className="flex-1 bg-[var(--input-bg)] border-[var(--input-border)] text-xs text-[var(--text-primary)] resize-none"
             />
           </div>
 
           <button
             onClick={handleUpdateSlide}
-            className="w-full py-2.5 rounded-md font-bold text-xs bg-gradient-to-r from-cyan-400 to-indigo-500 hover:opacity-90 transition-opacity text-white"
+            className="w-full py-2.5 rounded-md font-bold text-xs bg-gradient-to-r from-cyan-400 to-indigo-500 hover:opacity-90 transition-opacity text-white cursor-pointer"
           >
             Update Slide Content
           </button>
@@ -350,29 +352,29 @@ export default function SummarySlides({ slides, onSaveSlides }: SummarySlidesPro
 
       {/* Fullscreen Presenter Mode Modal */}
       {isFullscreen && (
-        <div className="fixed inset-0 z-50 bg-slate-950 flex flex-col items-center justify-center p-16 select-none">
+        <div className="fixed inset-0 z-50 bg-slate-950 flex flex-col items-center justify-center p-4 sm:p-16 select-none">
           <button
             onClick={() => setIsFullscreen(false)}
-            className="absolute top-8 right-8 w-10 h-10 rounded-full bg-white/5 hover:bg-white/10 text-white flex items-center justify-center font-bold text-lg cursor-pointer transition-colors"
+            className="absolute top-4 right-4 sm:top-8 sm:right-8 w-10 h-10 rounded-full bg-white/5 hover:bg-white/10 text-white flex items-center justify-center font-bold text-lg cursor-pointer transition-colors"
           >
             ✕
           </button>
           
-          <div className={`w-full max-w-[1000px] aspect-[16/9] ${getThemeClass(theme)} border border-white/10 p-16 rounded-2xl flex flex-col justify-center shadow-2xl`}>
-            <span className="text-xs uppercase font-bold tracking-widest text-cyan-400 mb-2">
+          <div className={`w-full max-w-[1000px] aspect-[16/9] ${getThemeClass(theme)} border border-white/10 p-6 sm:p-16 rounded-2xl flex flex-col justify-center shadow-2xl`}>
+            <span className="text-[10px] sm:text-xs uppercase font-bold tracking-widest text-cyan-400 mb-1 sm:mb-2">
               {activeSlide.category}
             </span>
-            <h2 className={`text-4xl font-extrabold bg-gradient-to-r ${getTitleColor(theme)} bg-clip-text text-transparent mb-8 tracking-tight`}>
+            <h2 className={`text-xl sm:text-3xl lg:text-4xl font-extrabold bg-gradient-to-r ${getTitleColor(theme)} bg-clip-text text-transparent mb-4 sm:mb-8 tracking-tight leading-snug`}>
               {activeSlide.title}
             </h2>
-            <ul className="list-disc pl-8 space-y-5 text-base text-slate-300">
+            <ul className="list-disc pl-5 sm:pl-8 space-y-2 sm:space-y-5 text-xs sm:text-sm lg:text-base text-slate-300">
               {activeSlide.bulletPoints.map((bullet, i) => (
                 <li key={i}>{bullet}</li>
               ))}
             </ul>
           </div>
           
-          <div className="absolute bottom-8 text-xs text-slate-400 font-semibold">
+          <div className="absolute bottom-4 sm:bottom-8 text-[10px] sm:text-xs text-slate-400 font-semibold text-center px-4">
             Slide {currentIndex + 1} of {slides.length} • Use Arrow Keys to navigate • Press ESC to exit
           </div>
         </div>

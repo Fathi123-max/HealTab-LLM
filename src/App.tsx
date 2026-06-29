@@ -23,6 +23,26 @@ export default function App() {
   const [documents, setDocuments] = useState<DocumentItem[]>([]);
   const [activeDocId, setActiveDocId] = useState<string | null>(null);
 
+  // Chat Console logs
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [isGeneratingChat, setIsGeneratingChat] = useState<boolean>(false);
+
+  // Theme Mode Settings
+  const [isDarkMode, setIsDarkMode] = useState<boolean>(true);
+
+  useEffect(() => {
+    const root = window.document.documentElement;
+    if (isDarkMode) {
+      root.classList.remove('light');
+    } else {
+      root.classList.add('light');
+    }
+  }, [isDarkMode]);
+
+  // Mobile Drawer States
+  const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false);
+  const [isChatOpen, setIsChatOpen] = useState<boolean>(false);
+
   // Authentication & Model Settings
   const [apiKey, setApiKey] = useState<string>('');
   const [isConnected, setIsConnected] = useState<boolean>(false);
@@ -35,15 +55,55 @@ export default function App() {
   const [podcastDialogue, setPodcastDialogue] = useState<PodcastTurn[]>([]);
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
   const [isContextLocked, setIsContextLocked] = useState<boolean>(false);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+
+  // Cached states per document ID to preserve history
+  const [graphDataMap, setGraphDataMap] = useState<Record<string, { nodes: GraphNode[]; links: GraphLink[] } | null>>({});
+  const [slidesMap, setSlidesMap] = useState<Record<string, SlideItem[]>>({});
+  const [podcastMap, setPodcastMap] = useState<Record<string, PodcastTurn[]>>({});
+  const [chatHistories, setChatHistories] = useState<Record<string, Message[]>>({});
+
+  // Auto-sync active document states to their respective caches when modified
+  useEffect(() => {
+    if (activeDocId) {
+      setChatHistories(prev => {
+        if (prev[activeDocId] === messages) return prev;
+        return { ...prev, [activeDocId]: messages };
+      });
+    }
+  }, [messages, activeDocId]);
+
+  useEffect(() => {
+    if (activeDocId) {
+      setGraphDataMap(prev => {
+        if (prev[activeDocId] === graphData) return prev;
+        return { ...prev, [activeDocId]: graphData };
+      });
+    }
+  }, [graphData, activeDocId]);
+
+  useEffect(() => {
+    if (activeDocId) {
+      setSlidesMap(prev => {
+        if (prev[activeDocId] === slides) return prev;
+        return { ...prev, [activeDocId]: slides };
+      });
+    }
+  }, [slides, activeDocId]);
+
+  useEffect(() => {
+    if (activeDocId) {
+      setPodcastMap(prev => {
+        if (prev[activeDocId] === podcastDialogue) return prev;
+        return { ...prev, [activeDocId]: podcastDialogue };
+      });
+    }
+  }, [podcastDialogue, activeDocId]);
 
   // Loader Flags
   const [isAnalyzing, setIsAnalyzing] = useState<boolean>(false);
   const [isGeneratingPodcast, setIsGeneratingPodcast] = useState<boolean>(false);
   const [isDraggingOver, setIsDraggingOver] = useState<boolean>(false);
-
-  // Chat Console logs
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [isGeneratingChat, setIsGeneratingChat] = useState<boolean>(false);
 
   // Restore API key from session storage
   useEffect(() => {
@@ -91,28 +151,52 @@ export default function App() {
   };
 
   const handleSelectDocument = (docId: string) => {
+    setIsSidebarOpen(false); // Close mobile sidebar drawer
+    if (docId === activeDocId) return; // Prevent state resetting if already active
+
+    // Set new active document index
     setActiveDocId(docId);
-    setGraphData(null);
-    setSlides([]);
-    setPodcastDialogue([]);
     setSelectedNodeId(null);
+    setCurrentPage(1);
 
     const doc = documents.find(d => d.id === docId);
     if (doc) {
-      // Auto-extract analysis with pre-configured static structured objects
-      const localData = getOfflineSummaryData(doc.name);
-      setGraphData({ nodes: localData.nodes, links: localData.links });
-      setSlides(localData.slides);
-      
-      // Clear message history & reset welcome prompt
-      setMessages([
-        {
-          id: 'welcome-' + docId,
-          role: 'ai',
-          text: `Loaded patient data: "${doc.name}". You can now query clinical metrics or view synthesized graph structure tabs.`,
-          isGrounded: true
-        }
-      ]);
+      // 1. Restore clinical graph data or fallback to offline summary
+      if (graphDataMap[docId] !== undefined) {
+        setGraphData(graphDataMap[docId]);
+      } else {
+        const localData = getOfflineSummaryData(doc.name);
+        setGraphData({ nodes: localData.nodes, links: localData.links });
+      }
+
+      // 2. Restore summary slides
+      if (slidesMap[docId] !== undefined) {
+        setSlides(slidesMap[docId]);
+      } else {
+        const localData = getOfflineSummaryData(doc.name);
+        setSlides(localData.slides);
+      }
+
+      // 3. Restore podcast dialogues
+      if (podcastMap[docId] !== undefined) {
+        setPodcastDialogue(podcastMap[docId]);
+      } else {
+        setPodcastDialogue([]);
+      }
+
+      // 4. Restore chat console message history
+      if (chatHistories[docId] !== undefined) {
+        setMessages(chatHistories[docId]);
+      } else {
+        setMessages([
+          {
+            id: 'welcome-' + docId,
+            role: 'ai',
+            text: `Loaded patient data: "${doc.name}". You can now query clinical metrics or view synthesized graph structure tabs.`,
+            isGrounded: true
+          }
+        ]);
+      }
     }
   };
 
@@ -396,12 +480,20 @@ export default function App() {
   const handleRemoveFile = (docId: string, e: React.MouseEvent) => {
     e.stopPropagation();
     setDocuments(prev => prev.filter(d => d.id !== docId));
+    
+    // Clear document caches to prevent memory retention
+    setChatHistories(prev => { const c = { ...prev }; delete c[docId]; return c; });
+    setGraphDataMap(prev => { const c = { ...prev }; delete c[docId]; return c; });
+    setSlidesMap(prev => { const c = { ...prev }; delete c[docId]; return c; });
+    setPodcastMap(prev => { const c = { ...prev }; delete c[docId]; return c; });
+
     if (activeDocId === docId) {
       setActiveDocId(null);
       setGraphData(null);
       setSlides([]);
       setPodcastDialogue([]);
       setSelectedNodeId(null);
+      setCurrentPage(1);
     }
   };
 
@@ -510,17 +602,35 @@ export default function App() {
   };
 
   return (
-    <div className="flex h-screen w-screen overflow-hidden bg-[#05070f] text-slate-100 font-sans antialiased">
+    <div className="flex h-screen w-screen overflow-hidden bg-[var(--bg-color)] text-[var(--text-primary)] font-sans antialiased relative">
+      {/* Sidebar Mobile Backdrop */}
+      {isSidebarOpen && (
+        <div
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 lg:hidden"
+          onClick={() => setIsSidebarOpen(false)}
+        />
+      )}
+
       {/* Sidebar */}
-      <aside className="w-[320px] border-r border-white/5 bg-slate-950/40 flex flex-col h-full z-10 backdrop-blur-xl">
-        <div className="p-6 border-b border-white/5 flex items-center gap-3">
-          <div className="w-9 h-9 rounded-lg bg-gradient-to-r from-teal-400 to-emerald-500 flex items-center justify-center text-white font-extrabold text-xl shadow-lg shadow-teal-400/20">
-            H
+      <aside className={`fixed inset-y-0 left-0 w-[300px] sm:w-[320px] border-r border-[var(--border-color)] bg-[var(--bg-color)] lg:bg-[var(--sidebar-bg)] flex flex-col h-full z-50 backdrop-blur-xl transition-transform duration-300 ease-in-out lg:relative lg:translate-x-0 ${
+        isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
+      }`}>
+        <div className="p-6 border-b border-[var(--border-color)] flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-lg bg-gradient-to-r from-teal-400 to-emerald-500 flex items-center justify-center text-white font-extrabold text-xl shadow-lg shadow-teal-400/20">
+              H
+            </div>
+            <div>
+              <h1 className="text-base font-bold bg-gradient-to-r from-teal-400 to-emerald-400 bg-clip-text text-transparent">HealTab LLM</h1>
+              <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Clinical Intelligence</span>
+            </div>
           </div>
-          <div>
-            <h1 className="text-base font-bold bg-gradient-to-r from-teal-400 to-emerald-400 bg-clip-text text-transparent">HealTab LLM</h1>
-            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Clinical Intelligence</span>
-          </div>
+          <button 
+            onClick={() => setIsSidebarOpen(false)}
+            className="lg:hidden p-1 text-slate-400 hover:text-white hover:bg-white/5 rounded-md text-sm cursor-pointer select-none"
+          >
+            ✕
+          </button>
         </div>
 
         <div className="flex-1 overflow-y-auto p-5 space-y-6">
@@ -533,14 +643,14 @@ export default function App() {
                 value={apiKey}
                 onChange={handleApiKeyInput}
                 placeholder="Enter Gemini API Key..."
-                className="w-full bg-slate-900 border border-white/10 rounded-md py-2 px-3 text-xs text-white outline-none focus:border-teal-400 transition-colors"
+                className="w-full bg-[var(--input-bg)] border border-[var(--input-border)] rounded-md py-2 px-3 text-xs text-[var(--text-primary)] outline-none focus:border-teal-400 transition-colors"
               />
             </div>
             <div className="flex items-center gap-2 mt-1">
               <span className={`w-2.5 h-2.5 rounded-full ${
                 isCheckingKey ? 'bg-amber-400 animate-pulse' : isConnected ? 'bg-emerald-500 shadow-md shadow-emerald-500/20' : 'bg-red-500'
               }`} />
-              <span className="text-[11px] font-medium text-slate-400">
+              <span className="text-[11px] font-medium text-[var(--text-secondary)]">
                 {isCheckingKey ? 'Verifying key...' : isConnected ? 'Active Connection' : 'Offline / Disconnected'}
               </span>
             </div>
@@ -552,7 +662,7 @@ export default function App() {
             <select
               value={selectedModel}
               onChange={(e) => setSelectedModel(e.target.value)}
-              className="w-full bg-slate-900 border border-white/10 rounded-md py-2 px-3 text-xs text-white outline-none cursor-pointer"
+              className="w-full bg-[var(--input-bg)] border border-[var(--input-border)] rounded-md py-2 px-3 text-xs text-[var(--text-primary)] outline-none cursor-pointer"
             >
               <option value="gemini-3.5-flash">Gemini 3.5 Flash (Recommended)</option>
               <option value="gemini-3.1-pro">Gemini 3.1 Pro (Flagship Reasoning)</option>
@@ -566,13 +676,13 @@ export default function App() {
             <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Quick Sample Cases</span>
             <button
               onClick={() => handlePreloadSample('retinopathy')}
-              className="w-full text-left bg-slate-900 border border-white/10 hover:border-teal-400 hover:bg-slate-900/60 rounded-md py-2.5 px-3 text-xs text-slate-300 transition-all flex items-center gap-2 font-medium"
+              className="w-full text-left bg-[var(--input-bg)] border border-[var(--input-border)] hover:border-teal-400 hover:opacity-90 rounded-md py-2.5 px-3 text-xs text-[var(--text-primary)] transition-all flex items-center gap-2 font-medium"
             >
               👁️ Case Study: Retinopathy
             </button>
             <button
               onClick={() => handlePreloadSample('alzheimer')}
-              className="w-full text-left bg-slate-900 border border-white/10 hover:border-teal-400 hover:bg-slate-900/60 rounded-md py-2.5 px-3 text-xs text-slate-300 transition-all flex items-center gap-2 font-medium"
+              className="w-full text-left bg-[var(--input-bg)] border border-[var(--input-border)] hover:border-teal-400 hover:opacity-90 rounded-md py-2.5 px-3 text-xs text-[var(--text-primary)] transition-all flex items-center gap-2 font-medium"
             >
               🧠 Clinical Trial: Alzheimer
             </button>
@@ -586,7 +696,7 @@ export default function App() {
               onDragLeave={handleDragLeave}
               onDrop={handleDrop}
               onClick={() => document.getElementById('file-picker-input')?.click()}
-              className={`border-2 border-dashed border-white/10 rounded-xl p-6 text-center cursor-pointer hover:border-teal-400/50 hover:bg-white/5 transition-all flex flex-col items-center gap-2 ${
+              className={`border-2 border-dashed border-[var(--input-border)] rounded-xl p-6 text-center cursor-pointer hover:border-teal-400/50 hover:bg-white/5 transition-all flex flex-col items-center gap-2 ${
                 isDraggingOver ? 'bg-teal-500/5 border-teal-400' : ''
               }`}
             >
@@ -598,8 +708,8 @@ export default function App() {
                 className="hidden"
               />
               <span className="text-2xl text-teal-400 select-none">📤</span>
-              <span className="text-xs font-bold text-slate-300">Upload PDF or TXT</span>
-              <span className="text-[10px] text-slate-500">Drag case records here</span>
+              <span className="text-xs font-bold text-[var(--text-primary)]">Upload PDF or TXT</span>
+              <span className="text-[10px] text-[var(--text-secondary)]">Drag case records here</span>
             </div>
           </div>
 
@@ -615,14 +725,14 @@ export default function App() {
                     className={`flex items-center justify-between p-2.5 border rounded-lg cursor-pointer transition-all ${
                       doc.id === activeDocId
                         ? 'border-cyan-400/40 bg-cyan-400/5'
-                        : 'border-white/5 bg-slate-900/40 hover:border-white/10'
+                        : 'border-[var(--border-color)] bg-[var(--input-bg)]/40 hover:border-cyan-400/40'
                     }`}
                   >
                     <div className="flex items-center gap-2 overflow-hidden flex-1 mr-2">
                       <span className="text-cyan-400 text-xs">📄</span>
                       <div className="overflow-hidden">
-                        <p className="text-xs font-semibold text-slate-200 truncate">{doc.name}</p>
-                        <span className="text-[9px] text-slate-500 font-bold">{formatBytes(doc.size)}</span>
+                        <p className="text-xs font-semibold text-[var(--text-primary)] truncate">{doc.name}</p>
+                        <span className="text-[9px] text-[var(--text-secondary)] font-bold">{formatBytes(doc.size)}</span>
                       </div>
                     </div>
                     <button
@@ -640,51 +750,86 @@ export default function App() {
       </aside>
 
       {/* Main Workspace Display Panel */}
-      <main className="flex-1 flex flex-col bg-slate-950/20">
+      <main className="flex-1 flex flex-col bg-[var(--main-bg)] min-w-0">
         {/* Workspace Tab Header */}
-        <header className="h-[70px] border-b border-white/5 flex items-center justify-between px-6 bg-slate-950/40 backdrop-blur-xl">
-          <div className="flex gap-1.5">
-            {[
-              { id: 'reader', label: '📖 Case Reader' },
-              { id: 'graph', label: '🔬 Clinical Graph' },
-              { id: 'deck', label: '📊 Summary Slides' },
-              { id: 'podcast', label: '🎙️ Podcast Study' },
-              { id: 'soap', label: '📝 SOAP Note' }
-            ].map(tab => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`px-3.5 py-1.5 rounded-md text-xs font-bold transition-all border ${
-                  activeTab === tab.id
-                    ? 'bg-teal-500/10 text-teal-300 border-teal-400/25 shadow-md shadow-teal-500/5'
-                    : 'bg-transparent text-slate-400 border-transparent hover:text-white hover:bg-white/5'
-                }`}
-              >
-                {tab.label}
-              </button>
-            ))}
+        <header className="h-[70px] border-b border-[var(--border-color)] flex items-center justify-between px-4 sm:px-6 bg-[var(--header-bg)] backdrop-blur-xl gap-2 select-none shrink-0">
+          <div className="flex items-center gap-2 overflow-hidden flex-1">
+            {/* Sidebar Toggle Button (Mobile Only) */}
+            <button
+              onClick={() => setIsSidebarOpen(true)}
+              className="lg:hidden p-2 rounded-md bg-white/5 hover:bg-white/10 border border-[var(--border-color)] text-slate-300 hover:text-white text-sm shrink-0 cursor-pointer"
+              title="Open Sidebar Menu"
+            >
+              ☰
+            </button>
+
+            {/* Horizontal Scroll tabs container */}
+            <div className="flex gap-1.5 overflow-x-auto no-scrollbar py-1">
+              {[
+                { id: 'reader', label: '📖 Case Reader' },
+                { id: 'graph', label: '🔬 Clinical Graph' },
+                { id: 'deck', label: '📊 Summary Slides' },
+                { id: 'podcast', label: '🎙️ Podcast Study' },
+                { id: 'soap', label: '📝 SOAP Note' }
+              ].map(tab => (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`px-3 py-1.5 rounded-md text-xs font-bold transition-all border shrink-0 ${
+                    activeTab === tab.id
+                      ? 'bg-teal-500/10 text-teal-300 border-teal-400/25 shadow-md shadow-teal-500/5'
+                      : 'bg-transparent text-[var(--text-secondary)] border-transparent hover:text-[var(--text-primary)] hover:bg-white/5'
+                  }`}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </div>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 shrink-0">
             {isAnalyzing && (
-              <span className="text-[10px] text-amber-400 font-bold uppercase tracking-wider animate-pulse mr-2">
-                ⚡ Analyzing Medical Data...
+              <span className="text-[10px] text-amber-500 font-bold uppercase tracking-wider animate-pulse mr-1 hidden md:inline">
+                ⚡ Analyzing...
               </span>
             )}
             {getActiveDocument() && isConnected && (
               <button
                 onClick={() => triggerStructuralAnalysis(getActiveDocument()!)}
                 disabled={isAnalyzing}
-                className="px-3 py-1.5 rounded-md text-xs font-bold text-amber-400 bg-white/5 border border-white/10 hover:bg-white/10 transition-all flex items-center gap-1.5 disabled:opacity-40"
+                className="px-2.5 sm:px-3 py-1.5 rounded-md text-xs font-bold text-amber-500 bg-white/5 border border-[var(--border-color)] hover:bg-white/10 transition-all flex items-center gap-1 disabled:opacity-40"
+                title="Re-Analyze Case"
               >
-                🔄 Re-Analyze Case
+                <span>🔄</span>
+                <span className="hidden sm:inline">Re-Analyze</span>
               </button>
             )}
             <button
               onClick={printSummaryReport}
-              className="px-3.5 py-1.5 rounded-md text-xs font-bold text-teal-400 bg-white/5 border border-white/10 hover:bg-white/10 transition-all flex items-center gap-1.5"
+              className="px-2.5 sm:px-3 py-1.5 rounded-md text-xs font-bold text-teal-500 bg-white/5 border border-[var(--border-color)] hover:bg-white/10 transition-all flex items-center gap-1"
+              title="Print Summary Report"
             >
-              📄 Print Report
+              <span>📄</span>
+              <span className="hidden sm:inline">Print Report</span>
+            </button>
+
+            {/* Theme Toggle Button */}
+            <button
+              onClick={() => setIsDarkMode(!isDarkMode)}
+              className="px-2.5 sm:px-3 py-1.5 rounded-md text-xs font-bold text-[var(--text-secondary)] hover:text-[var(--text-primary)] bg-white/5 border border-[var(--border-color)] hover:bg-white/10 transition-all flex items-center gap-1 cursor-pointer select-none"
+              title={isDarkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
+            >
+              <span>{isDarkMode ? "☀️" : "🌙"}</span>
+              <span className="hidden sm:inline">{isDarkMode ? "Light" : "Dark"}</span>
+            </button>
+            
+            {/* Chat Toggle Button (Mobile Only) */}
+            <button
+              onClick={() => setIsChatOpen(true)}
+              className="lg:hidden p-2 rounded-md bg-white/5 hover:bg-white/10 border border-[var(--border-color)] text-slate-300 hover:text-white text-sm cursor-pointer relative"
+              title="Open AI Chat"
+            >
+              💬
             </button>
           </div>
         </header>
@@ -695,6 +840,8 @@ export default function App() {
             <CaseReader
               activeDoc={getActiveDocument()}
               onAskAboutTerm={handleAskAboutTerm}
+              currentPage={currentPage}
+              onPageChange={setCurrentPage}
             />
           )}
 
@@ -735,17 +882,40 @@ export default function App() {
         </div>
       </main>
 
-      {/* Right Chat Console Panel */}
-      <section className="w-[380px] border-l border-white/5 h-full">
-        <AgentChat
-          messages={messages}
-          onSendMessage={handleSendMessage}
-          isGenerating={isGeneratingChat}
-          onNavigateCitation={(docId, _pageNum) => {
-            handleSelectDocument(docId);
-            setActiveTab('reader');
-          }}
+      {/* Chat Mobile Backdrop */}
+      {isChatOpen && (
+        <div
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 lg:hidden"
+          onClick={() => setIsChatOpen(false)}
         />
+      )}
+
+      {/* Right Chat Console Panel */}
+      <section className={`fixed inset-y-0 right-0 w-[320px] sm:w-[380px] border-l border-[var(--border-color)] h-full z-50 bg-[var(--bg-color)] flex flex-col transition-transform duration-300 ease-in-out lg:relative lg:translate-x-0 ${
+        isChatOpen ? 'translate-x-0' : 'translate-x-full'
+      }`}>
+        <div className="flex-1 h-full relative flex flex-col">
+          {/* Mobile close button for Chat */}
+          <div className="lg:hidden absolute top-4 right-4 z-50">
+            <button
+              onClick={() => setIsChatOpen(false)}
+              className="p-1.5 rounded-full bg-slate-900 border border-white/10 text-slate-400 hover:text-white text-xs cursor-pointer select-none"
+            >
+              ✕
+            </button>
+          </div>
+          <AgentChat
+            messages={messages}
+            onSendMessage={handleSendMessage}
+            isGenerating={isGeneratingChat}
+            onNavigateCitation={(docId, pageNum) => {
+              handleSelectDocument(docId);
+              setActiveTab('reader');
+              setCurrentPage(pageNum);
+              setIsChatOpen(false);
+            }}
+          />
+        </div>
       </section>
     </div>
   );

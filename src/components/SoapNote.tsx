@@ -97,7 +97,7 @@ export default function SoapNote({ document, apiKey, model, isConnected }: SoapN
 
   if (!document) {
     return (
-      <div className="flex flex-col items-center justify-center h-full text-slate-500 gap-4 p-8">
+      <div className="flex flex-col items-center justify-center h-full text-[var(--text-secondary)] gap-4 p-8">
         <span className="text-6xl opacity-30">📝</span>
         <p className="text-sm font-medium text-center">Load a patient file to compile standard SOAP documentation.</p>
       </div>
@@ -105,28 +105,28 @@ export default function SoapNote({ document, apiKey, model, isConnected }: SoapN
   }
 
   return (
-    <div className="flex h-full p-6 gap-6 overflow-hidden">
+    <div className="flex h-full p-4 sm:p-6 gap-6 overflow-hidden">
       {/* SOAP note sheet */}
-      <Card className="flex-1 bg-slate-950/45 border-white/5 shadow-2xl backdrop-blur-xl flex flex-col overflow-hidden">
-        <div className="p-5 border-b border-white/5 flex items-center justify-between">
+      <Card className="flex-1 bg-[var(--card-bg)] border-[var(--border-color)] shadow-2xl backdrop-blur-xl flex flex-col overflow-hidden">
+        <div className="p-4 sm:p-5 border-b border-[var(--border-color)] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
-            <h2 className="text-base font-bold text-white">Clinical SOAP Record</h2>
-            <span className="text-[10px] text-slate-400">Subjective, Objective, Assessment, and Treatment Plan Documentation</span>
+            <h2 className="text-base font-bold text-[var(--text-primary)]">Clinical SOAP Record</h2>
+            <span className="text-[10px] text-[var(--text-secondary)]">Subjective, Objective, Assessment, and Treatment Plan Documentation</span>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 shrink-0">
             {isConnected && (
               <button
                 onClick={compileSoapNoteOnline}
                 disabled={isCompiling}
-                className="px-3 py-1.5 rounded-md text-xs font-bold bg-cyan-500/10 text-cyan-400 border border-cyan-500/25 hover:bg-cyan-500/20 disabled:opacity-40"
+                className="px-3 py-1.5 rounded-md text-xs font-bold bg-cyan-500/10 text-cyan-400 border border-cyan-500/25 hover:bg-cyan-500/20 disabled:opacity-40 cursor-pointer"
               >
                 {isCompiling ? 'Generating with AI...' : '⚡ Generate with Gemini'}
               </button>
             )}
             <button
               onClick={() => setIsExported(true)}
-              className="px-3 py-1.5 rounded-md text-xs font-bold bg-gradient-to-r from-cyan-400 to-indigo-500 text-white"
+              className="px-3 py-1.5 rounded-md text-xs font-bold bg-gradient-to-r from-cyan-400 to-indigo-500 text-white cursor-pointer"
             >
               Export to EHR
             </button>
@@ -146,37 +146,37 @@ export default function SoapNote({ document, apiKey, model, isConnected }: SoapN
             <Textarea
               value={soapData.subjective}
               onChange={(e) => setSoapData({ ...soapData, subjective: e.target.value })}
-              className="bg-slate-900 border-white/10 text-xs text-slate-200 resize-none min-h-[90px]"
+              className="bg-[var(--input-bg)] border-[var(--input-border)] text-xs text-[var(--text-primary)] resize-none min-h-[90px]"
             />
           </div>
 
           {/* O */}
-          <div className="flex flex-col gap-2 border-t border-white/5 pt-4">
+          <div className="flex flex-col gap-2 border-t border-[var(--border-color)] pt-4">
             <span className="text-xs font-extrabold text-amber-400 tracking-wider">OBJECTIVE (O)</span>
             <Textarea
               value={soapData.objective}
               onChange={(e) => setSoapData({ ...soapData, objective: e.target.value })}
-              className="bg-slate-900 border-white/10 text-xs text-slate-200 resize-none min-h-[90px]"
+              className="bg-[var(--input-bg)] border-[var(--input-border)] text-xs text-[var(--text-primary)] resize-none min-h-[90px]"
             />
           </div>
 
           {/* A */}
-          <div className="flex flex-col gap-2 border-t border-white/5 pt-4">
+          <div className="flex flex-col gap-2 border-t border-[var(--border-color)] pt-4">
             <span className="text-xs font-extrabold text-purple-400 tracking-wider">ASSESSMENT (A)</span>
             <Textarea
               value={soapData.assessment}
               onChange={(e) => setSoapData({ ...soapData, assessment: e.target.value })}
-              className="bg-slate-900 border-white/10 text-xs text-slate-200 resize-none min-h-[90px]"
+              className="bg-[var(--input-bg)] border-[var(--input-border)] text-xs text-[var(--text-primary)] resize-none min-h-[90px]"
             />
           </div>
 
           {/* P */}
-          <div className="flex flex-col gap-2 border-t border-white/5 pt-4">
+          <div className="flex flex-col gap-2 border-t border-[var(--border-color)] pt-4">
             <span className="text-xs font-extrabold text-emerald-400 tracking-wider">PLAN (P)</span>
             <Textarea
               value={soapData.plan}
               onChange={(e) => setSoapData({ ...soapData, plan: e.target.value })}
-              className="bg-slate-900 border-white/10 text-xs text-slate-200 resize-none min-h-[90px]"
+              className="bg-[var(--input-bg)] border-[var(--input-border)] text-xs text-[var(--text-primary)] resize-none min-h-[90px]"
             />
           </div>
         </CardContent>

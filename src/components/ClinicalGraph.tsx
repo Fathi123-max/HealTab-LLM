@@ -253,9 +253,9 @@ export default function ClinicalGraph({
   };
 
   return (
-    <div className="flex h-full p-6 gap-6 overflow-hidden">
+    <div className="flex flex-col lg:flex-row h-full p-4 lg:p-6 gap-4 lg:gap-6 overflow-y-auto lg:overflow-hidden">
       {/* Visual Canvas */}
-      <Card className="flex-[1.4] bg-slate-950/45 border-white/5 shadow-2xl backdrop-blur-xl relative overflow-hidden flex items-center justify-center">
+      <Card className="w-full lg:flex-[1.4] h-[350px] lg:h-full bg-[var(--card-bg)] border-[var(--border-color)] shadow-2xl backdrop-blur-xl relative overflow-hidden flex items-center justify-center shrink-0">
         {nodes.length === 0 ? (
           <div className="text-slate-500 text-sm font-medium">Extract graph to visualize relationships.</div>
         ) : (
@@ -358,20 +358,20 @@ export default function ClinicalGraph({
       </Card>
 
       {/* Info Sidebar */}
-      <Card className="flex-[0.6] bg-slate-950/45 border-white/5 p-6 shadow-2xl backdrop-blur-xl flex flex-col gap-5 overflow-y-auto">
+      <Card className="w-full lg:flex-[0.6] bg-[var(--card-bg)] border-[var(--border-color)] p-4 lg:p-6 shadow-2xl backdrop-blur-xl flex flex-col gap-4 lg:gap-5 lg:overflow-y-auto min-h-[300px]">
         <div className="flex flex-col gap-2">
-          <h3 className="text-sm font-bold text-slate-400 uppercase tracking-wider">Clinical Search Filter</h3>
+          <h3 className="text-sm font-bold text-[var(--text-secondary)] uppercase tracking-wider">Clinical Search Filter</h3>
           <Input
             value={filterText}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFilterText(e.target.value)}
             placeholder="Filter entities (e.g., 'drug')..."
-            className="bg-slate-900 border-white/10 text-xs text-white"
+            className="bg-[var(--input-bg)] border-[var(--input-border)] text-xs text-[var(--text-primary)]"
           />
         </div>
 
         {/* Clinical Color-Blind Category Legend */}
-        <div className="flex flex-col gap-2 border-t border-white/5 pt-4">
-          <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Clinical Legend</span>
+        <div className="flex flex-col gap-2 border-t border-[var(--border-color)] pt-4">
+          <span className="text-[10px] font-bold text-[var(--text-secondary)] uppercase tracking-widest">Clinical Legend</span>
           <div className="flex flex-wrap gap-2 text-[10px]">
             <span className="px-2 py-1 rounded bg-[#2dd4bf]/10 text-[#2dd4bf] font-bold border border-[#2dd4bf]/25 flex items-center gap-1">👤 Patient</span>
             <span className="px-2 py-1 rounded bg-[#fbbf24]/10 text-[#fbbf24] font-bold border border-[#fbbf24]/25 flex items-center gap-1">🌡️ Symptom</span>
@@ -382,22 +382,22 @@ export default function ClinicalGraph({
           </div>
         </div>
 
-        <div className="flex items-center gap-3 border-t border-white/5 pt-4">
+        <div className="flex items-center gap-3 border-t border-[var(--border-color)] pt-4">
           <input
             type="checkbox"
             id="chk-context"
             checked={isContextLocked}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => onToggleContextLock(e.target.checked)}
-            className="w-4 h-4 rounded border-white/10 bg-slate-900 text-cyan-400 focus:ring-0 cursor-pointer"
+            className="w-4 h-4 rounded border-[var(--input-border)] bg-[var(--input-bg)] text-cyan-400 focus:ring-0 cursor-pointer"
           />
-          <label htmlFor="chk-context" className="text-xs font-semibold text-slate-300 cursor-pointer select-none">
+          <label htmlFor="chk-context" className="text-xs font-semibold text-[var(--text-primary)] cursor-pointer select-none">
             Lock context to selected node details
           </label>
         </div>
 
-        <div className="flex-1 border-t border-white/5 pt-4 flex flex-col justify-between">
+        <div className="flex-1 border-t border-[var(--border-color)] pt-4 flex flex-col justify-between">
           <div>
-            <h3 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-4">Entity Details</h3>
+            <h3 className="text-sm font-bold text-[var(--text-secondary)] uppercase tracking-wider mb-4">Entity Details</h3>
             {activeNode ? (
               <div className="flex flex-col">
                 <h4
@@ -407,19 +407,19 @@ export default function ClinicalGraph({
                   {activeNode.label}
                 </h4>
                 {codingBadge}
-                <div className="text-slate-300 text-xs leading-relaxed mt-1">
+                <div className="text-[var(--text-primary)] text-xs leading-relaxed mt-1">
                   <p className="mb-2"><strong>Category:</strong> {activeNode.type.toUpperCase()}</p>
                   <p><strong>Context Details:</strong> {activeNode.details}</p>
                 </div>
                 <button
                   onClick={() => onQueryNode?.(activeNode.label)}
-                  className="mt-4 w-full py-2 bg-slate-900 border border-white/10 hover:border-cyan-400/35 hover:bg-slate-900/60 rounded text-[11px] font-bold text-white transition-all active:scale-95"
+                  className="mt-4 w-full py-2 bg-[var(--input-bg)] border border-[var(--input-border)] hover:border-cyan-400/35 hover:bg-white/5 rounded text-[11px] font-bold text-[var(--text-primary)] transition-all active:scale-95 cursor-pointer"
                 >
                   💬 Ask AI about this node
                 </button>
               </div>
             ) : (
-              <p className="text-slate-500 text-xs italic">Select a node on the graph canvas to inspect clinical coding details.</p>
+              <p className="text-[var(--text-secondary)] text-xs italic">Select a node on the graph canvas to inspect clinical coding details.</p>
             )}
           </div>
         </div>
